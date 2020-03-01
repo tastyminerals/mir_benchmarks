@@ -1,0 +1,32 @@
+{
+	"name": "app",
+	"authors": [
+		"tasty"
+	],
+	"description": "misc D benchmarks",
+	"copyright": "Copyright © 2019, tasty",
+	"license": "MIT",
+
+	"targetType": "executable",
+	"dependencies": {
+        "mir": "~>3.2.0"
+	},
+	"dflags-ldc": ["-mcpu=native"],
+
+	"buildTypes": {
+		"release": {
+			"buildOptions": ["releaseMode", "inline", "optimize"],
+			"dflags": ["-boundscheck=off"]
+		},
+		"debug": {
+			"buildOptions": ["debugMode", "debugInfo", "optimize"]
+		},
+		"debug-profile": {
+			"buildOptions": ["debugMode", "debugInfo", "profile"]
+		},
+		"tests": {
+			"buildOptions": ["unittests"]
+		}
+
+	}
+}
