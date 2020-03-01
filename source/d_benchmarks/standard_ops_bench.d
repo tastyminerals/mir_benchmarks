@@ -40,6 +40,8 @@ struct Matrix(T)
     T[] data;
     int rows;
     int cols;
+    // allow Matrix[] instead of Matrix.data[]
+    alias data this;
 
     this(int rows, int cols)
     {
@@ -69,7 +71,7 @@ struct Matrix(T)
     /// Allow element 2D indexing, e.g. Matrix[row, col]
     T opIndex(in int r, in int c)
     {
-        return this.data[toMatrixIdx(this, r, c)];
+        return this.data[toIdx(this, r, c)];
     }
 
 }
@@ -135,7 +137,7 @@ do
     return Matrix!T(m1.rows, m1.cols, data);
 }
 
-pragma(inline) static int toMatrixIdx(T)(Matrix!T m, in int i, in int j)
+pragma(inline) static int toIdx(T)(Matrix!T m, in int i, in int j)
 {
     return m.cols * i + j;
 }
@@ -156,7 +158,7 @@ do
         {
             for (int k; k < m2.rows; ++k)
             {
-                m3.data[toMatrixIdx(m3, i, j)] += m1[i, k] * m2[k, j];
+                m3.data[toIdx(m3, i, j)] += m1[i, k] * m2[k, j];
             }
         }
     }
