@@ -2,6 +2,7 @@
 	"fileVersion": 1,
 	"versions": {
 		"cairod": "0.0.1-alpha.3+1.10.2",
+		"cblas": "2.0.4",
 		"color": "0.0.8",
 		"derelict-ft": "1.0.2",
 		"derelict-util": "2.1.0",
@@ -11,6 +12,7 @@
 		"gtk-d": "3.3.1",
 		"mir": "3.2.0",
 		"mir-algorithm": "3.7.18",
+		"mir-blas": "1.1.9",
 		"mir-core": "1.1.0",
 		"mir-linux-kernel": "1.0.1",
 		"mir-random": "2.2.11",

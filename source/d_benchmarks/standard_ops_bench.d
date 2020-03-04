@@ -1,3 +1,4 @@
+module standard_ops_bench;
 /*
 This file contains several benchmarks for multidimensional D arrays:
 
@@ -18,11 +19,13 @@ RUN: dub run --compiler=ldc2 --build=release
 TEST: dub run --compiler=ldc2 --build=tests
 */
 
-import std.algorithm : joiner, map, sort, sum, SwapStrategy;
+import core.memory : GC;
+import std.algorithm : joiner, fill, map, sort, sum, SwapStrategy;
 import std.array : array;
 import std.datetime.stopwatch : AutoStart, StopWatch;
 import std.format : format;
 import std.math : pow, sqrt;
+import std.numeric : dotProduct;
 import std.random : uniform, unpredictableSeed, Xorshift;
 import std.range : chunks, generate, take, zip;
 import std.stdio;
@@ -46,6 +49,7 @@ struct Matrix(T)
     this(int rows, int cols)
     {
         this.data = new T[rows * cols];
+        this.data.fill(0); // because double/float initialize to nan
         this.rows = rows;
         this.cols = cols;
     }
@@ -71,7 +75,7 @@ struct Matrix(T)
     /// Allow element 2D indexing, e.g. Matrix[row, col]
     T opIndex(in int r, in int c)
     {
-        return this.data[toIdx(this, r, c)];
+        return this.data[this.cols * r + c];
     }
 
 }
@@ -137,20 +141,14 @@ do
     return Matrix!T(m1.rows, m1.cols, data);
 }
 
-pragma(inline) static int toIdx(T)(Matrix!T m, in int i, in int j)
-{
-    return m.cols * i + j;
-}
-
 /// [2 x 3]@[3 x 2]-- > [2 x 2], slow
-Matrix!T matrixDotProduct(T)(Matrix!T m1, Matrix!T m2)
+Matrix!T matrixDotProduct(T)(Matrix!T m1, Matrix!T m2, Matrix!T initM)
 in
 {
     assert(m1.rows == m2.cols);
 }
 do
 {
-    Matrix!T m3 = Matrix!T(m1.rows, m2.cols);
     /// This implementation requires opIndex in Matrix struct.
     for (int i; i < m1.rows; ++i)
     {
@@ -158,11 +156,11 @@ do
         {
             for (int k; k < m2.rows; ++k)
             {
-                m3.data[toIdx(m3, i, j)] += m1[i, k] * m2[k, j];
+                initM.data[initM.cols * i + j] += m1[i, k] * m2[k, j];
             }
         }
     }
-    return m3;
+    return initM;
 }
 
 double squareL2Norm(T)(Matrix!T m)
@@ -183,13 +181,13 @@ void reportTime(StopWatch sw, string msg)
     writeln(format(msg ~ ": %s sec. %s msec.", msecs / 1000.0, usecs / 1000.0));
 }
 
-void runBenchmarks()
+void runStandardBenchmarks()
 {
     auto sw = StopWatch(AutoStart.no);
     int rows = 5000;
     int cols = 6000;
 
-    /// Element-wise sum of 2x[rows, cols] random 2D int arrays
+    /// Element-wise sum of 2x[rows, cols] random 2D int arrays.
     int[][] arr2D1 = getRandom2DArray!int(10, rows, cols);
     int[][] arr2D2 = getRandom2DArray!int(10, rows, cols);
     sw.start;
@@ -197,7 +195,7 @@ void runBenchmarks()
     sw.stop;
     reportTime(sw, format("Element-wise sum of two %sx%s int arrays", rows, cols));
 
-    /// Element-wise multiplication of 2x[rows, cols] random 2D double arrays
+    /// Element-wise multiplication of 2x[rows, cols] random 2D double arrays.
     double[][] arr2D3 = getRandom2DArray!double(1.0, rows, cols);
     double[][] arr2D4 = getRandom2DArray!double(1.0, rows, cols);
     sw.reset;
@@ -206,7 +204,7 @@ void runBenchmarks()
     sw.stop;
     reportTime(sw, format("Element-wise multiplication of two %sx%s double arrays", rows, cols));
 
-    /// Element-wise sum of 2x[rows, cols] random int Matrices
+    /// Element-wise sum of 2x[rows, cols] random int Matrices.
     auto m1 = Matrix!int(rows, cols, getRandomArray!int(10, rows * cols));
     auto m2 = Matrix!int(rows, cols, getRandomArray!int(10, rows * cols));
     sw.reset;
@@ -215,7 +213,7 @@ void runBenchmarks()
     sw.stop;
     reportTime(sw, format("Element-wise sum of two %sx%s int Matrices", rows, cols));
 
-    /// Element-wise multiplication of 2x[rows, cols] random double Matrices
+    /// Element-wise multiplication of 2x[rows, cols] random double Matrices.
     auto m3 = Matrix!double(rows, cols, getRandomArray!double(1.0, rows * cols));
     auto m4 = Matrix!double(rows, cols, getRandomArray!double(1.0, rows * cols));
     sw.reset;
@@ -224,20 +222,29 @@ void runBenchmarks()
     sw.stop;
     reportTime(sw, format("Element-wise multiplication of two %sx%s double Matrices", rows, cols));
 
-    /// Dot product of two random double Matrices, we pick smaller arrays for speed
-    int rowsForDot = 500;
-    int colsForDot = 600;
-    auto m5 = Matrix!double(rowsForDot, colsForDot, getRandomArray!double(1.0,
-            rowsForDot * colsForDot));
-    auto m6 = Matrix!double(colsForDot, rowsForDot, getRandomArray!double(1.0,
-            rowsForDot * colsForDot));
+    /// Scalar dot product of two random double arrays.
+    auto vec0 = getRandomArray!double(1.0, rows * cols);
+    auto vec1 = getRandomArray!double(1.0, rows * cols);
     sw.reset;
     sw.start;
-    auto e = matrixDotProduct!double(m5, m6).to2D;
+    auto h = dotProduct(vec0, vec1);
+    sw.stop;
+    reportTime(sw, format("Scalar product of two %s double arrays", rows * cols));
+
+    /// Dot product of two random double Matrices, we pick smaller arrays for speed.
+    const int dotRows = 500;
+    const int dotCols = 1000;
+    auto m5 = Matrix!double(dotRows, dotCols, getRandomArray!double(1.0, dotRows * dotCols));
+    auto m6 = Matrix!double(dotCols, dotRows, getRandomArray!double(1.0, dotRows * dotCols));
+    sw.reset;
+    sw.start;
+
+    Matrix!double initMatrix = Matrix!double(m5.rows, m6.cols);
+    auto e = matrixDotProduct!double(m5, m6, initMatrix);
     sw.stop;
     reportTime(sw, "Dot product of double Matrices");
 
-    /// L2 norm of double Matrix
+    /// L2 norm of double Matrix.
     auto m7 = Matrix!double(rows, cols, getRandomArray!double(1.0, rows * cols));
     sw.reset;
     sw.start;
@@ -245,7 +252,7 @@ void runBenchmarks()
     sw.stop;
     reportTime(sw, format("L2 norm of %sx%s double Matrix", rows, cols));
 
-    /// Standard sort of double Matrix
+    /// Standard sort of double Matrix.
     auto m8 = Matrix!double(rows, cols, getRandomArray!double(10.0, rows * cols));
     sw.reset;
     sw.start;
@@ -256,6 +263,7 @@ void runBenchmarks()
 
 unittest
 {
+
     int[][] arr1 = [[1, 2, 3], [4, 5, 6]];
     int[][] arr2 = [[1, 1, 1], [2, 2, 2]];
     int[][] res0 = [[2, 3, 4], [6, 7, 8]];
@@ -264,15 +272,19 @@ unittest
     auto ma = Matrix!int(2, 3, [2, 1, 1, 2, 2, 0]);
     auto mb = Matrix!int(2, 3, [-1, 0, 1, 0, 0, -1]);
     int[][] res1 = [[1, 1, 2], [2, 2, -1]];
-    assert(matrixElementWiseOp!int(OPS.sum, m0, m1) == res0);
+    assert(matrixElementWiseOp!int(OPS.sum, ma, mb).to2D == res1);
 
-    auto mc = Matrix!double(2, 3, [-1, 0, 1, 0, 0, -1]);
-    Matrix!int res2 = Matrix!int(2, 2, [-1, -1, 0, 0]);
-    assert(matrixDotProduct!int(ma, mc) == res2);
+    auto mc = Matrix!double(2, 3, [-2, 0, 1, 0, 0, -3]);
+    auto md = Matrix!double(3, 2, [-1, 0, 2, 0, 0, -1]);
+    auto initM = Matrix!double(2, 2);
+    auto res2 = Matrix!double(2, 2, [2, -1, 0, 3]);
+    assert(matrixDotProduct!double(mc, md, initM).data == res2.data);
 
-    auto md = Matrix!double(2, 3, [-1.0, 2.0, 1.0, 0, 0, -1.5]);
-    double res3 = 2.87228;
-    double[][] res4 = [[-1.5, -1, 0], [0, 1, 2]];
-    assert(squareL2Norm!double(md) == res3);
-    assert(standardSort!double(mc).to2D == res4);
+    import std.math : approxEqual;
+
+    auto me = Matrix!double(2, 3, [-1.5, 2.3, 1.1, 0.2, 0.5, -3.7]);
+    double res3 = 4.7676;
+    auto res4 = Matrix!double(2, 3, [-3.7, -1.5, 0.2, 0.5, 1.1, 2.3]);
+    assert(approxEqual(squareL2Norm!double(me), res3));
+    assert(standardSort!double(me).to2D == res4.to2D);
 }

@@ -1,0 +1,6 @@
+name "d_benchmarks"
+
+subConfiguration "mir-blas" "mkl-sequential"
+
+lflags "/LIBPATH:C:\Program Files (x86)\IntelSWTools\compilers_and_libraries\windows\mkl\lib\intel64" platform="windows-x86_64-ldc"
+lflags "/LIBPATH:C:\Program Files (x86)\IntelSWTools\compilers_and_libraries\windows\mkl\lib\ia32" platform="windows-x86-ldc"

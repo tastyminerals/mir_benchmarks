@@ -22,6 +22,15 @@ def simple_2d_mul(rows, cols):
         rows, cols, end - start))
 
 
+def scalar_product(elems):
+    a = np.random.rand(elems)
+    b = np.random.rand(elems)
+    start = timer()
+    c = a @ b
+    end = timer()
+    print("Scalar product between 2x{} arrays: {} sec.".format(elems, end - start))
+
+
 def dot_product(rows, cols):
     a = np.random.rand(rows, cols)
     b = np.random.rand(cols, rows)
@@ -44,7 +53,7 @@ def square_l2_norm(rows, cols):
 def simple_sort(rows, cols):
     a = np.random.rand(rows, cols)
     start = timer()
-    c = np.sort(a)
+    c = np.sort(a, axis=None)
     end = timer()
     print("Quicksort of {}x{} float matrix: {} sec.".format(
         rows, cols, end - start))
@@ -53,6 +62,7 @@ def simple_sort(rows, cols):
 def benchmark():
     simple_2d_sum(5000, 6000)
     simple_2d_mul(5000, 6000)
+    scalar_product(5000 * 6000)
     dot_product(5000, 6000)
     square_l2_norm(5000, 6000)
     simple_sort(5000, 6000)
