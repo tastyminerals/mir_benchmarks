@@ -2,12 +2,10 @@ module mir_ops_bench;
 
 import mir.ndslice;
 import mir.random : threadLocalPtr, Random;
-import mir.random.variable : uniformVar;
-import mir.random.engine.xorshift;
-import mir.random.algorithm;
+import mir.random.variable : uniformVar, normalVar;
+import mir.random.algorithm : randomSlice;
 
-// import mir.blas : gemm;
-import std.range : generate, take;
+import mir.blas : gemm;
 import std.array : array;
 import std.datetime.stopwatch : AutoStart, StopWatch;
 import std.format : format;
@@ -16,14 +14,6 @@ import std.stdio;
 import mir.math.common : fastmath, optmath;
 
 alias Slice = mir_slice!(double*, 1LU, cast(mir_slice_kind) 2);
-
-enum OPS
-{
-    sum = "+",
-    mul = "*",
-    sub = "-",
-    div = "/"
-}
 
 pragma(inline) static @optmath fmuladd(T, Z)(const T a, Z z)
 {
@@ -36,36 +26,16 @@ double dotProduct(Slice arr0, Slice arr1)
     return reduce!fmuladd(0.0, zipped);
 }
 
-pragma(inline, false) @fastmath double loopedDotProduct(Slice arr0, Slice arr1, double accu = 0.0)
-in
+@fastmath double loopedDotProduct(in Slice s0, in Slice s1)
 {
-    assert(arr0.shape == arr1.shape);
-}
-do
-{
-    for (int i; i < arr0.shape[0]; ++i)
+    pragma(inline, false);
+    double accu = 0;
+    foreach (size_t i; 0 .. s0.length)
     {
-        accu += arr0[i] * arr1[i];
+        // will result in vectorized fused-multiply-add instructions
+        accu += s0[i] * s1[i];
     }
     return accu;
-}
-
-static auto getRandomArray(T)(in T max, in int elems)
-{
-    Xorshift rnd;
-    rnd.seed(unpredictableSeed);
-    return generate(() => uniform(0, max, rnd)).take(elems).array.sliced;
-}
-
-static auto getRandomMatrix(T)(in T max, in int rows, in int cols)
-{
-    Xorshift rnd;
-    rnd.seed(unpredictableSeed);
-    int err;
-    const amount = rows * cols;
-    return generate(() => uniform(0, max, rnd)).take(amount).array.sliced.reshape([
-            3, 2
-            ], err);
 }
 
 /*
@@ -111,26 +81,33 @@ void runMirBenchmarks()
     reportTime(sw, format("Element-wise multiplication of two %sx%s 2D slices", rows, cols));
 
     /// Scalar product of two double arrays.
-    auto arr0 = threadLocalPtr!Random.randomSlice(uniformVar!double(-1.0, 1.0), rows * cols);
-    auto arr1 = threadLocalPtr!Random.randomSlice(uniformVar!double(-1.0, 1.0), rows * cols);
-    sw.reset;
-    sw.start;
-    res2 = dotProduct(arr0, arr1);
-    sw.stop;
-    reportTime(sw, format("Scalar product of 2x%s double slices", rows * cols));
+    auto arr0 = threadLocalPtr!Random.randomSlice(uniformVar!double(-1.0, 1.0), 5000);
+    auto arr1 = threadLocalPtr!Random.randomSlice(uniformVar!double(-1.0, 1.0), 5000);
 
     /// Scalar product of two double Slices.
     sw.reset;
     sw.start;
-    res3 = loopedDotProduct(arr0, arr1);
+    for (int i; i < 50; ++i)
+    {
+        res3 = loopedDotProduct(arr0, arr1);
+    }
     sw.stop;
     reportTime(sw, format("Scalar product of 2x%s double slices (plain loop)", rows * cols));
+
+    sw.reset;
+    sw.start;
+    for (int i; i < 50; ++i)
+    {
+        res2 = dotProduct(arr0, arr1);
+    }
+    sw.stop;
+    reportTime(sw, format("Scalar product of 2x%s double slices", rows * cols));
 
     /// Dot product of two double 2D slices.
     auto m3 = slice!double([rows, cols]);
     sw.reset;
     sw.start;
-    // gemm(1.0, m0, m1, 0, m3); // bugged!!!
+    gemm(1.0, m0, m1, 0, m3);
     sw.stop;
     reportTime(sw, format("Dot product of two 2D double slices"));
 

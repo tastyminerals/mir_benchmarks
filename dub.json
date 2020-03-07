@@ -10,10 +10,11 @@
 	"targetType": "executable",
 	"dependencies": {
 		"mir-algorithm": "~>3.7.18",
-		"mir-random": "~>2.2.11"
+		"mir-random": "~>2.2.11",
+		"mir-blas": "~>1.1.9"
 	},
 	"dflags-ldc": ["-mcpu=native"],
-
+	"subConfigurations": {"mir-blas": "mkl-sequential"},
 	"buildTypes": {
 		"release": {
 			"buildOptions": ["releaseMode", "inline", "optimize"],
