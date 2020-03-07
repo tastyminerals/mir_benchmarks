@@ -35,6 +35,9 @@ This repo contains various benchmarks for multidimensional D arrays:
 | L2 norm of [5000, 6000] double struct matrix                                                  | ~0.014 |      x14       |
 | Sort of [5000, 6000] double struct matrix (axis=-1)                                           | ~2.435 |      x1.9      |
 
+### Mir D
+// TODO
+
 ##### Naive Dot Product
 Although our naive dot product implementation is pretty fast with small to medium sized matrices it becomes prohibitively slow with big matrices.
 Numpy uses well-known BLAS [general matrix multiplication `gemm`](https://software.intel.com/en-us/mkl-developer-reference-fortran-gemm) routine which does not have this issue.
