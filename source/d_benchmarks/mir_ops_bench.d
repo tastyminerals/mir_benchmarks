@@ -24,9 +24,9 @@ pragma(inline) static @optmath fmuladd(T, Z)(const T a, Z z)
     return a + z.a * z.b;
 }
 
-double dotProduct(SliceArr arr0, SliceArr arr1)
+double dotProduct(SliceArr sliceA1D, SliceArr sliceB1D)
 {
-    auto zipped = zip!true(arr0, arr1);
+    auto zipped = zip!true(sliceA1D, sliceB1D);
     return reduce!fmuladd(0.0, zipped);
 }
 
@@ -45,11 +45,11 @@ double dotProduct(SliceArr arr0, SliceArr arr1)
 @fastmath double squareL2Norm(SliceMatrix m)
 {
     pragma(inline, false);
-    auto m0 = m.flattened;
+    auto matrixA = m.flattened;
     double accu = 0;
-    foreach (size_t i; 0 .. m0.length)
+    foreach (size_t i; 0 .. matrixA.length)
     {
-        accu += m0[i].pow(2);
+        accu += matrixA[i].pow(2);
     }
     return accu.sqrt;
 }
@@ -79,34 +79,34 @@ void runMirBenchmarks()
     const cols = 6000;
 
     /// Element-wise sum of two int Slices.
-    auto m0 = threadLocalPtr!Random.randomSlice(uniformVar!double(-1.0, 1.0), [
+    auto matrixA = threadLocalPtr!Random.randomSlice(uniformVar!double(-1.0, 1.0), [
             rows, cols
             ]);
-    auto m1 = threadLocalPtr!Random.randomSlice(uniformVar!double(-1.0, 1.0), [
+    auto matrixB = threadLocalPtr!Random.randomSlice(uniformVar!double(-1.0, 1.0), [
             rows, cols
             ]);
     sw.start;
-    auto res0 = (m0 + m1).array;
+    auto res0 = (matrixA + matrixB).array;
     sw.stop;
     reportTime(sw, format("Element-wise sum of two %sx%s 2D slices", rows, cols));
 
     /// Element-wise multiplication of two double Slices.
     sw.reset;
     sw.start;
-    auto res1 = (m0 * m1).array;
+    auto res1 = (matrixA * matrixB).array;
     sw.stop;
     reportTime(sw, format("Element-wise multiplication of two %sx%s 2D slices", rows, cols));
 
     /// Scalar product of two double arrays.
-    auto arr0 = threadLocalPtr!Random.randomSlice(uniformVar!double(-1.0, 1.0), 5000);
-    auto arr1 = threadLocalPtr!Random.randomSlice(uniformVar!double(-1.0, 1.0), 5000);
+    auto sliceA1D = threadLocalPtr!Random.randomSlice(uniformVar!double(-1.0, 1.0), 5000);
+    auto sliceB1D = threadLocalPtr!Random.randomSlice(uniformVar!double(-1.0, 1.0), 5000);
 
     /// Scalar product of two double Slices.
     sw.reset;
     sw.start;
     for (int i; i < 50; ++i)
     {
-        res3 = loopedDotProduct(arr0, arr1);
+        res3 = loopedDotProduct(sliceA1D, sliceB1D);
     }
     sw.stop;
     reportTime(sw, format("Scalar product of 2x%s double slices (plain loop)", rows * cols));
@@ -115,33 +115,33 @@ void runMirBenchmarks()
     sw.start;
     for (int i; i < 50; ++i)
     {
-        res2 = dotProduct(arr0, arr1);
+        res2 = dotProduct(sliceA1D, sliceB1D);
     }
     sw.stop;
     reportTime(sw, format("Scalar product of 2x%s double slices", rows * cols));
 
     /// Dot product of two double 2D slices.
-    auto m2 = threadLocalPtr!Random.randomSlice(uniformVar!double(-1.0, 1.0), [
+    auto matrixC = threadLocalPtr!Random.randomSlice(uniformVar!double(-1.0, 1.0), [
             cols, rows
             ]);
-    auto m3 = slice!double([rows, rows]);
+    auto matrixD = slice!double([rows, rows]);
     sw.reset;
     sw.start;
-    gemm(1.0, m0, m2, 0, m3);
+    gemm(1.0, matrixA, matrixC, 0, matrixD);
     sw.stop;
     reportTime(sw, format("Dot product of two 2D double slices"));
 
     /// L2 norm of double Slice.
     sw.reset;
     sw.start;
-    auto res4 = squareL2Norm(m1);
+    auto res4 = squareL2Norm(matrixB);
     sw.stop;
     reportTime(sw, format("L2 norm of %sx%s double slice = %s", rows, cols, res4));
 
     /// Sort of double Slice along axis=0
     sw.reset;
     sw.start;
-    m0.byDim!0
+    matrixA.byDim!0
         .each!sort;
     sw.stop;
     reportTime(sw, format("Sorting %sx%s double slice", rows, cols));
