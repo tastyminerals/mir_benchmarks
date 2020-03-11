@@ -1,6 +1,7 @@
 from collections import defaultdict as dd
-import numpy as np
 from timeit import default_timer as timer
+
+import numpy as np
 
 
 def allocation_and_functions():
@@ -9,37 +10,44 @@ def allocation_and_functions():
 
 def functions(nruns=1):
     rows, cols = 5000, 6000
-    int_matrixA = np.random.randint(1, 10, [rows, cols])
-    int_matrixB = np.random.randint(1, 10, [rows, cols])
+    small_int_matrixA = np.random.randint(1, 10, [int(rows / 20), int(cols / 30)])
+    small_int_matrixB = np.random.randint(1, 10, [int(rows / 20), int(cols / 30)])
     float_matrixA = np.random.rand(rows, cols)
-    float_matrixB = np.random.rand(rows, cols)
+    small_float_matrixA = np.random.rand(int(rows / 20), int(cols / 30))
+    small_float_matrixB = np.random.rand(int(rows / 20), int(cols / 30))
     float_matrixC = np.random.rand(cols, rows)
     float_arrayA = np.random.rand(rows * cols)
     float_arrayB = np.random.rand(rows * cols)
 
     funcs = dd(list)
-    name = "2d sum of two {}x{} matrices (float64)".format(rows, cols)
+    name = "2d sum of two {}x{} matrices (float64), (200 loops)".format(
+        int(rows / 20), int(cols / 30)
+    )
     for _ in range(nruns):
         start = timer()
-        _ = int_matrixA + int_matrixB
+        for _ in range(200):
+            _ = small_int_matrixA + small_int_matrixB
         end = timer()
         funcs[name].append(end - start)
 
-    name = "2d multiplication of two {}x{} matrices (float64)".format(rows, cols)
+    name = "2d multiplication of two {}x{} matrices (float64), (200 loops)".format(
+        int(rows / 20), int(cols / 30)
+    )
     for _ in range(nruns):
         start = timer()
-        _ = float_matrixB * float_matrixB
+        for _ in range(200):
+            _ = small_float_matrixA * small_float_matrixB
         end = timer()
         funcs[name].append(end - start)
 
-    name = "scalar dot product of two {} arrrays (float64)".format(rows * cols)
+    name = "Scalar product of two {} arrays (float64))".format(rows * cols)
     for _ in range(nruns):
         start = timer()
         _ = float_arrayA @ float_arrayB
         end = timer()
         funcs[name].append(end - start)
 
-    name = "dot product of {}x{} and {}x{} matrices (float64)".format(
+    name = "Dot product of {}x{} and {}x{} matrices (float64)".format(
         rows, cols, cols, rows
     )
     for _ in range(nruns):
@@ -66,7 +74,7 @@ def functions(nruns=1):
 
 
 def benchmark():
-    # allocation_and_functions()
+    # TODO allocation_and_functions()
     results = functions(10)
     for name, runs in results.items():
         print("{}, {} sec.".format(name, sum(runs) / len(runs)))

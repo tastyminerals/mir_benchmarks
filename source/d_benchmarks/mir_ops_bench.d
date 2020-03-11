@@ -1,20 +1,18 @@
 module mir_ops_bench;
 
-import mir.ndslice;
-import mir.math.sum;
-import mir.math.common : pow, sqrt;
-import mir.ndslice.sorting : sort;
-import mir.random : threadLocalPtr, Random;
-import mir.random.variable : uniformVar, normalVar;
-import mir.random.algorithm : randomSlice;
-
 import mir.blas : gemm;
+import mir.math.common : pow, sqrt;
+import mir.math.common : fastmath, optmath;
+import mir.math.sum;
+import mir.ndslice;
+import mir.ndslice.sorting : sort;
+import mir.random : Random, threadLocalPtr;
+import mir.random.algorithm : randomSlice;
+import mir.random.variable : normalVar, uniformVar;
 import std.array : array;
 import std.datetime.stopwatch : AutoStart, StopWatch;
 import std.format : format;
 import std.stdio;
-
-import mir.math.common : fastmath, optmath;
 
 alias SliceArr = mir_slice!(double*, 1LU, cast(mir_slice_kind) 2);
 alias SliceMatrix = Slice!(double*, 2LU, cast(mir_slice_kind) 2);
@@ -24,13 +22,13 @@ pragma(inline) static @optmath fmuladd(T, Z)(const T a, Z z)
     return a + z.a * z.b;
 }
 
-double dotProduct(SliceArr sliceA1D, SliceArr sliceB1D)
+double scalarProduct(SliceArr sliceA1D, SliceArr sliceB1D)
 {
     auto zipped = zip!true(sliceA1D, sliceB1D);
     return reduce!fmuladd(0.0, zipped);
 }
 
-@fastmath double loopedDotProduct(in SliceArr s0, in SliceArr s1)
+@fastmath double loopedScalarProduct(in SliceArr s0, in SliceArr s1)
 {
     pragma(inline, false);
     double accu = 0;
@@ -54,13 +52,7 @@ double dotProduct(SliceArr sliceA1D, SliceArr sliceB1D)
     return accu.sqrt;
 }
 
-/*
-__gshared is a hack that makes value equivalent to a raw C global (module-level) variables.
-It is used here to trigger eager evaluation of the scalar product function which returns single double value.
-*/
-__gshared double res2;
-__gshared double res3;
-__gshared double res4;
+// __gshared double res;
 
 void reportTime(StopWatch sw, string msg)
 {
@@ -68,81 +60,145 @@ void reportTime(StopWatch sw, string msg)
     auto usecs = sw.peek.total!"usecs";
     auto hnsecs = sw.peek.total!"hnsecs";
     auto nsecs = sw.peek.total!"nsecs";
-    writeln(format(msg ~ ": %s sec. %s ms. %s μs. %s ns.", msecs / 1000.0,
+    writeln(format(msg ~ ": %s sec. %s ms. %s μs. %s hs.", msecs / 1000.0,
             usecs / 1000.0, hnsecs / 1000.0, nsecs / 1000.0));
+}
+
+long[][string] functions(in int nruns = 10)
+{
+
+    /*
+    __gshared is a hack that makes value equivalent to a raw C global (module-level) variables.
+    It is used here to trigger eager evaluation of the scalar product function which returns single double value.
+    */
+    __gshared double gsharedRes0;
+    __gshared double gsharedRes1;
+    __gshared double gsharedRes2;
+
+    long[][string] funcs;
+    auto sw = StopWatch(AutoStart.no);
+    const rows = 5000;
+    const cols = 6000;
+    auto smallIntMatrixA = threadLocalPtr!Random.randomSlice(uniformVar!int(1,
+            10), [rows / 20, cols / 30]);
+    auto smallIntMatrixB = threadLocalPtr!Random.randomSlice(uniformVar!int(1,
+            10), [rows / 20, cols / 30]);
+    auto smallMatrixA = threadLocalPtr!Random.randomSlice(uniformVar!double(0.0,
+            1.0), [rows / 20, cols / 30]);
+    auto smallMatrixB = threadLocalPtr!Random.randomSlice(uniformVar!double(0.0,
+            1.0), [rows / 20, cols / 30]);
+    auto matrixA = threadLocalPtr!Random.randomSlice(uniformVar!double(0.0, 1.0), [
+            rows, cols
+            ]);
+    auto matrixB = threadLocalPtr!Random.randomSlice(uniformVar!double(0.0, 1.0), [
+            rows, cols
+            ]);
+    auto matrixC = threadLocalPtr!Random.randomSlice(uniformVar!double(0.0, 1.0), [
+            cols, rows
+            ]);
+    auto sliceA = threadLocalPtr!Random.randomSlice(uniformVar!double(0.0, 1.0), rows * cols);
+    auto sliceB = threadLocalPtr!Random.randomSlice(uniformVar!double(0.0, 1.0), rows * cols);
+
+    /// Element-wise sum of two int Slices.
+    string name0 = format("Element-wise sum of two [%sx%s] slices (int), (200 loops)",
+            rows / 20, cols / 30);
+    for (int i; i < nruns; ++i)
+    {
+        sw.reset;
+        sw.start;
+        for (int j; j < 200; ++j)
+        {
+            auto res = (smallIntMatrixA + smallIntMatrixB).array;
+        }
+        sw.stop;
+        funcs[name0] ~= sw.peek.total!"nsecs"; // div by 1000^3 to get sec.
+    }
+
+    /// Element-wise multiplication of two double Slices.
+    string name1 = format("Element-wise multiplication of two [%sx%s] slices (double), (200 loops)",
+            rows / 20, cols / 30);
+    for (int i; i < nruns; ++i)
+    {
+        sw.reset;
+        sw.start;
+        for (int j; j < 200; ++j)
+        {
+            auto res = (smallMatrixA * smallMatrixB).array;
+        }
+        sw.stop;
+        funcs[name1] ~= sw.peek.total!"nsecs";
+    }
+
+    /// Scalar product of two double Slices.
+    string name2 = format("Scalar product of two [%s] slices (double)", rows * cols);
+    for (int i; i < nruns; ++i)
+    {
+        sw.reset;
+        sw.start;
+        gsharedRes0 = scalarProduct(sliceA, sliceB);
+        sw.stop;
+        funcs[name2] ~= sw.peek.total!"nsecs";
+    }
+
+    /// Scalar product of two double arrays (plain loop).
+    string name3 = format("Scalar product of two [%s] slices (double), (plain loop)", rows * cols);
+    for (int i; i < nruns; ++i)
+    {
+        sw.reset;
+        sw.start;
+        gsharedRes1 = loopedScalarProduct(sliceA, sliceB);
+        sw.stop;
+        funcs[name3] ~= sw.peek.total!"nsecs";
+    }
+
+    /// Dot product of two double 2D slices.
+    string name4 = format("Dot product of two [%sx%s] and [%sx%s] slices (double)",
+            rows, cols, cols, rows);
+    for (int i; i < nruns; ++i)
+    {
+        auto matrixD = slice!double([rows, rows]);
+        sw.reset;
+        sw.start;
+        gemm(1.0, matrixA, matrixC, 0, matrixD);
+        sw.stop;
+        funcs[name4] ~= sw.peek.total!"nsecs";
+    }
+
+    /// L2 norm of double Slice.
+    string name5 = format("L2 norm of [%sx%s] slice (double)", rows, cols);
+    for (int i; i < nruns; ++i)
+    {
+        sw.reset;
+        sw.start;
+        gsharedRes2 = squareL2Norm(matrixB);
+        sw.stop;
+        funcs[name5] ~= sw.peek.total!"nsecs";
+    }
+
+    /// Sort of double Slice along axis=0.
+    string name6 = format("Sort of [%sx%s] slice (double)", rows, cols);
+    for (int i; i < nruns; ++i)
+    {
+        auto matrix = threadLocalPtr!Random.randomSlice(uniformVar!double(-1.0,
+                1.0), [rows, cols]);
+        sw.reset;
+        sw.start;
+        matrix.byDim!0
+            .each!sort;
+        sw.stop;
+        funcs[name6] ~= sw.peek.total!"nsecs";
+    }
+
+    return funcs;
 }
 
 void runMirBenchmarks()
 {
-    auto sw = StopWatch(AutoStart.no);
-    const rows = 5000;
-    const cols = 6000;
-
-    /// Element-wise sum of two int Slices.
-    auto matrixA = threadLocalPtr!Random.randomSlice(uniformVar!double(-1.0, 1.0), [
-            rows, cols
-            ]);
-    auto matrixB = threadLocalPtr!Random.randomSlice(uniformVar!double(-1.0, 1.0), [
-            rows, cols
-            ]);
-    sw.start;
-    auto res0 = (matrixA + matrixB).array;
-    sw.stop;
-    reportTime(sw, format("Element-wise sum of two %sx%s 2D slices", rows, cols));
-
-    /// Element-wise multiplication of two double Slices.
-    sw.reset;
-    sw.start;
-    auto res1 = (matrixA * matrixB).array;
-    sw.stop;
-    reportTime(sw, format("Element-wise multiplication of two %sx%s 2D slices", rows, cols));
-
-    /// Scalar product of two double arrays.
-    auto sliceA1D = threadLocalPtr!Random.randomSlice(uniformVar!double(-1.0, 1.0), 5000);
-    auto sliceB1D = threadLocalPtr!Random.randomSlice(uniformVar!double(-1.0, 1.0), 5000);
-
-    /// Scalar product of two double Slices.
-    sw.reset;
-    sw.start;
-    for (int i; i < 50; ++i)
+    auto timings = functions;
+    foreach (pair; timings.byKeyValue)
     {
-        res3 = loopedDotProduct(sliceA1D, sliceB1D);
+        // convert nsec. to sec.
+        const double secs = pair.value.map!(a => a / pow(1000.0, 3)).sum / pair.value.length;
+        writeln(format("%s %s sec.", pair.key, secs));
     }
-    sw.stop;
-    reportTime(sw, format("Scalar product of 2x%s double slices (plain loop)", rows * cols));
-
-    sw.reset;
-    sw.start;
-    for (int i; i < 50; ++i)
-    {
-        res2 = dotProduct(sliceA1D, sliceB1D);
-    }
-    sw.stop;
-    reportTime(sw, format("Scalar product of 2x%s double slices", rows * cols));
-
-    /// Dot product of two double 2D slices.
-    auto matrixC = threadLocalPtr!Random.randomSlice(uniformVar!double(-1.0, 1.0), [
-            cols, rows
-            ]);
-    auto matrixD = slice!double([rows, rows]);
-    sw.reset;
-    sw.start;
-    gemm(1.0, matrixA, matrixC, 0, matrixD);
-    sw.stop;
-    reportTime(sw, format("Dot product of two 2D double slices"));
-
-    /// L2 norm of double Slice.
-    sw.reset;
-    sw.start;
-    auto res4 = squareL2Norm(matrixB);
-    sw.stop;
-    reportTime(sw, format("L2 norm of %sx%s double slice = %s", rows, cols, res4));
-
-    /// Sort of double Slice along axis=0
-    sw.reset;
-    sw.start;
-    matrixA.byDim!0
-        .each!sort;
-    sw.stop;
-    reportTime(sw, format("Sorting %sx%s double slice", rows, cols));
 }
