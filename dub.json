@@ -14,7 +14,7 @@
 		"mir-blas": "~>1.1.9"
 	},
 	"dflags-ldc": ["-mcpu=native"],
-	"subConfigurations": {"mir-blas": "mkl-sequential"},
+	"subConfigurations": {"mir-blas": "twolib"},
 	"buildTypes": {
 		"release": {
 			"buildOptions": ["releaseMode", "inline", "optimize"],
