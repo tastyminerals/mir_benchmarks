@@ -67,7 +67,7 @@ python other_benchmarks/basic_ops_bench.py
 | Sort of [500x600] slice (double)                                           | 0.00981535  |
 
 ##### Unoptimized Dot Product
-Although our dot product implementation is pretty fast with small to medium sized matrices it becomes prohibitively slow with big matrices.
+Although our dot product implementation is pretty fast with small to medium sized matrices, it becomes prohibitively slow with big matrices.
 Efficient matrix multiplication is a field of its own.
 Numpy uses heavily optimized well-known BLAS [general matrix multiplication `gemm`](https://software.intel.com/en-us/mkl-developer-reference-fortran-gemm) routine.
 
