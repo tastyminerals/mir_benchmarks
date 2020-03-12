@@ -1,4 +1,5 @@
 # D Benchmarks against Numpy
+Each benchmark was run 20 times with 0.5 sec. timeout, the timings were then collected and averaged.
 
 ### Hardware
 
@@ -59,12 +60,12 @@ Numpy uses well-known BLAS [general matrix multiplication `gemm`](https://softwa
 
 | unoptimized dot product of struct matrices | time (sec.) |
 | ------------------------------------------ | ----------: |
-| 2x[100 x 100]                              |        0.01 |
-| 2x[1000 x 1000]                            |        2.21 |
-| 2x[1500 x 1000]                            |         5.6 |
-| 2x[1500 x 1500]                            |        9.28 |
-| 2x[2000 x 2000]                            |       44.59 |
-| 2x[2100 x 2100]                            |       55.13 |
+| 2 x [100 x 100]                            |        0.01 |
+| 2 x [1000 x 1000]                          |        2.21 |
+| 2 x [1500 x 1000]                          |         5.6 |
+| 2 x [1500 x 1500]                          |        9.28 |
+| 2 x [2000 x 2000]                          |       44.59 |
+| 2 x [2100 x 2100]                          |       55.13 |
 
 ##### Destructive Sort
 TODO
