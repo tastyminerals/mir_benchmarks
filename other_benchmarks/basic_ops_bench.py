@@ -31,22 +31,22 @@ def functions(nruns=1):
     float_arrayB = np.random.rand(rows * cols)
 
     funcs = dd(list)
-    name = "Element-wise sum of two {}x{} matrices (int), (500 loops)".format(
+    name = "Element-wise sum of two {}x{} matrices (int), (1000 loops)".format(
         int(rows / reduceRowsBy), int(cols / reduceColsBy)
     )
     for _ in range(nruns):
         start = timer()
-        for _ in range(500):
+        for _ in range(1000):
             _ = small_int_matrixA + small_int_matrixB
         end = timer()
         funcs[name].append(end - start)
 
-    name = "Element-wise multiplication of two {}x{} matrices (float64), (500 loops)".format(
+    name = "Element-wise multiplication of two {}x{} matrices (float64), (1000 loops)".format(
         int(rows / reduceRowsBy), int(cols / reduceColsBy)
     )
     for _ in range(nruns):
         start = timer()
-        for _ in range(500):
+        for _ in range(1000):
             _ = small_float_matrixA * small_float_matrixB
         end = timer()
         funcs[name].append(end - start)

@@ -190,8 +190,8 @@ long[][string] functions(in int nruns = 10)
     const reduceRowsBy = 5;
     const reduceColsBy = 6;
 
-    const dotRows = 1000;
-    const dotCols = 500;
+    const dotRows = rows;
+    const dotCols = cols;
 
     int[][] smallIntArrOfArraysA = getRandomAArray!int(10, rows / reduceRowsBy, cols / reduceColsBy);
     int[][] smallIntArrOfArraysB = getRandomAArray!int(10, rows / reduceRowsBy, cols / reduceColsBy);
@@ -219,13 +219,13 @@ long[][string] functions(in int nruns = 10)
     auto matrixD = Matrix!double(rows, cols, getRandomArray!double(1.0, rows * cols));
 
     long[][string] funcs;
-    string name0 = format("Element-wise sum of two [%sx%s] arrays of arrays (int), (50 loops)",
+    string name0 = format("Element-wise sum of two [%sx%s] arrays of arrays (int), (1000 loops)",
             rows / reduceRowsBy, cols / reduceColsBy);
     for (int i; i < nruns; ++i)
     {
         sw.reset;
         sw.start;
-        for (int j; j < 500; ++j)
+        for (int j; j < 1000; ++j)
         {
             int[][] res = elementWiseOP!int(OPS.sum, smallIntArrOfArraysA, smallIntArrOfArraysB);
         }
@@ -233,13 +233,13 @@ long[][string] functions(in int nruns = 10)
         funcs[name0] ~= sw.peek.total!"nsecs";
     }
 
-    string name1 = format("Element-wise multiplication of two [%sx%s] arrays of arrays (double), (50 loops)",
+    string name1 = format("Element-wise multiplication of two [%sx%s] arrays of arrays (double), (1000 loops)",
             rows / reduceRowsBy, cols / reduceColsBy);
     for (int i; i < nruns; ++i)
     {
         sw.reset;
         sw.start;
-        for (int j; j < 500; ++j)
+        for (int j; j < 1000; ++j)
         {
             double[][] res = elementWiseOP!double(OPS.mul, smallArrOfArraysA, smallArrOfArraysB);
         }
@@ -247,13 +247,13 @@ long[][string] functions(in int nruns = 10)
         funcs[name1] ~= sw.peek.total!"nsecs";
     }
 
-    string name2 = format("Element-wise sum of two [%sx%s] struct matrices (int), (50 loops)",
+    string name2 = format("Element-wise sum of two [%sx%s] struct matrices (int), (1000 loops)",
             rows / reduceRowsBy, cols / reduceColsBy);
     for (int i; i < nruns; ++i)
     {
         sw.reset;
         sw.start;
-        for (int j; j < 500; ++j)
+        for (int j; j < 1000; ++j)
         {
             auto res = matrixElementWiseOp!int(OPS.sum, smallIntMatrixA, smallIntMatrixB).to2D;
         }
@@ -261,13 +261,13 @@ long[][string] functions(in int nruns = 10)
         funcs[name2] ~= sw.peek.total!"nsecs";
     }
 
-    string name3 = format("Element-wise multiplication of two [%sx%s] struct matrices (double), (50 loops)",
+    string name3 = format("Element-wise multiplication of two [%sx%s] struct matrices (double), (1000 loops)",
             rows / reduceRowsBy, cols / reduceColsBy);
     for (int i; i < nruns; ++i)
     {
         sw.reset;
         sw.start;
-        for (int j; j < 500; ++j)
+        for (int j; j < 1000; ++j)
         {
             auto res = matrixElementWiseOp!double(OPS.mul, smallMatrixA, smallMatrixB).to2D;
         }

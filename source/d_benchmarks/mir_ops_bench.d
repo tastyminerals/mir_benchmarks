@@ -103,7 +103,7 @@ long[][string] functions(in int nruns = 10)
     long[][string] funcs;
 
     /// Element-wise sum of two int Slices.
-    string name0 = format("Element-wise sum of two [%sx%s] slices (int), (500 loops)",
+    string name0 = format("Element-wise sum of two [%sx%s] slices (int), (1000 loops)",
             rows / reduceRowsBy, cols / reduceColsBy);
     for (int i; i < nruns; ++i)
     {
@@ -114,7 +114,7 @@ long[][string] functions(in int nruns = 10)
         // In numpy you can either use builtin C funcitons
         // or reuse memory by runing slow python loops.
         auto res = smallIntMatrixA.shape.slice!int;
-        for (int j; j < 500; ++j)
+        for (int j; j < 1000; ++j)
         {
             // zero memory allocation
             res[] = smallIntMatrixA * smallIntMatrixB; // can be any element-wise math expression
@@ -124,7 +124,7 @@ long[][string] functions(in int nruns = 10)
     }
 
     /// Element-wise multiplication of two double Slices.
-    string name1 = format("Element-wise multiplication of two [%sx%s] slices (double), (500 loops)",
+    string name1 = format("Element-wise multiplication of two [%sx%s] slices (double), (1000 loops)",
             rows / reduceRowsBy, cols / reduceColsBy);
     for (int i; i < nruns; ++i)
     {
@@ -132,7 +132,7 @@ long[][string] functions(in int nruns = 10)
         sw.start;
         // ditto, see comment for Element-wise sum of two int Slices.
         auto res = smallMatrixA.shape.slice!double;
-        for (int j; j < 500; ++j)
+        for (int j; j < 1000; ++j)
         {
             // zero memory allocation
             res[] = smallMatrixA * smallMatrixB; // can be any element-wise math expression
