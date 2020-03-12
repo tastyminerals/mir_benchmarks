@@ -6,7 +6,9 @@ Each benchmark was run 20 times with 0 sec. timeout, the timings were then colle
  * CPU: Quad Core Intel Core i7-7700HQ (-MT MCP-) speed/min/max: 919/800/3800 MHz Kernel: 5.5.7-1-MANJARO x86_64 Up: 4h 36m 
  * Mem: 2814.2/48147.6 MiB (5.8%) Storage: 489.05 GiB (6.6% used) Procs: 271 Shell: fish 3.1.0 inxi: 3.0.37 
 
-| Benchmark                                                                            | Numpy (BLAS) (sec.) | Standard D (sec.) | Mir D (sec.)         |
+### Benchmarks Yay!
+
+| Description                                                                          | Numpy (BLAS) (sec.) | Standard D (sec.) | Mir D (sec.)         |
 | ------------------------------------------------------------------------------------ | ------------------- | ----------------- | -------------------- |
 | Element-wise sum of two 250x200 matrices (int), (50 loops)                           | 0.00115             | 0.00400213 (x3.5) | 0.00014372 (x1/8)    |
 | Element-wise multiplication of two 250x200 matrices (float64/double), (50 loops)     | 0.0011578           | 0.0132323 (x11.4) | 0.00013852 (x1/8.3)  |
@@ -19,9 +21,9 @@ Each benchmark was run 20 times with 0 sec. timeout, the timings were then colle
 | L2 norm of 5000x6000 matrix (float64/double)                                         | 0.0072423           | 0.0160546 (x2.2)  | 0.0110136 (x1.6)     |
 | Quicksort of 5000x6000 matrix (float64/double)                                       | 2.6516816           | 0.178071 (x14.8)  | 1.52406 (x1/0.6)     |
 
-### Numpy (BLAS)
+##### Numpy (BLAS)
 
-| Benchmark                                                                   | Time (sec.)           |
+| Description                                                                 | Time (sec.)           |
 | --------------------------------------------------------------------------- | --------------------- |
 | Element-wise sum of two 250x200 matrices (int), (50 loops)                  | 0.0011499844000354641 |
 | Element-wise multiplication of two 250x200 matrices (float64), (50 loops)   | 0.0011577772499094864 |
@@ -34,9 +36,9 @@ Each benchmark was run 20 times with 0 sec. timeout, the timings were then colle
 | L2 norm of 5000x6000 matrix (float64)                                       | 0.007242295700052637  |
 | Sort of 5000x6000 matrix (float64)                                          | 2.6516815754499476    |
 
-### Standard D
+##### Standard D
 
-| Benchmark                                                                                                       | Time (sec.) |
+| Description                                                                                                     | Time (sec.) |
 | --------------------------------------------------------------------------------------------------------------- | ----------- |
 | Element-wise sum of two [250x200] arrays of arrays (int), (50 loops)                                            | 0.0164181   |
 | Element-wise multiplication of two [250x200] arrays of arrays (double), (50 loops)                              | 0.0173038   |
@@ -55,9 +57,9 @@ Each benchmark was run 20 times with 0 sec. timeout, the timings were then colle
 | L2 norm of [5000x6000] struct matrix (double)                                                                   | 0.0160546   |
 | Sort of [5000x6000] struct matrix (double)                                                                      | 0.178071    |
 
-### Mir D
+##### Mir D
 
-| Benchmark                                                                  | Time (sec.) |
+| Description                                                                | Time (sec.) |
 | -------------------------------------------------------------------------- | ----------- |
 | Element-wise sum of two [250x200] slices (int), (50 loops)                 | 0.00014372  |
 | Element-wise multiplication of two [250x200] slices (double), (50 loops)   | 0.00013852  |
@@ -71,13 +73,12 @@ Each benchmark was run 20 times with 0 sec. timeout, the timings were then colle
 | Dot product of two [5000x6000] and [6000x5000] slices (double)             | 2.03398     |
 | Sort of [5000x6000] slice (double)                                         | 1.52406     |
 
-
 ##### Unoptimized Dot Product
 Although our dot product implementation is pretty fast with small to medium sized matrices it becomes prohibitively slow with big matrices.
 Efficient matrix multiplication is a field of its own.
 Numpy uses heavily optimized well-known BLAS [general matrix multiplication `gemm`](https://software.intel.com/en-us/mkl-developer-reference-fortran-gemm) routine.
 
-| unoptimized dot product of struct matrices | time (sec.) |
+| Unoptimized dot product of struct matrices | Time (sec.) |
 | ------------------------------------------ | ----------: |
 | 2 x [100 x 100]                            |        0.01 |
 | 2 x [1000 x 1000]                          |        2.21 |
