@@ -328,7 +328,8 @@ void runStandardBenchmarks()
 {
     writeln("---[Standard D]---");
     auto timings = functions(20);
-    foreach (pair; timings.byKeyValue)
+    import mir.series; // for sorted output
+    foreach (pair; timings.series)
     {
         // convert nsec. to sec. and compute the average
         const double secs = pair.value.map!(a => a / pow(1000.0, 3)).sum / pair.value.length;
