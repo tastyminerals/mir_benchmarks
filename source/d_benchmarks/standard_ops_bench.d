@@ -185,8 +185,8 @@ void reportTime(StopWatch sw, string msg)
 long[][string] functions(in int nruns = 10)
 {
     auto sw = StopWatch(AutoStart.no);
-    const rows = 5000;
-    const cols = 6000;
+    const rows = 500;
+    const cols = 600;
     const reduceRowsBy = 5;
     const reduceColsBy = 6;
 
@@ -225,7 +225,7 @@ long[][string] functions(in int nruns = 10)
     {
         sw.reset;
         sw.start;
-        for (int j; j < 50; ++j)
+        for (int j; j < 500; ++j)
         {
             int[][] res = elementWiseOP!int(OPS.sum, smallIntArrOfArraysA, smallIntArrOfArraysB);
         }
@@ -239,7 +239,7 @@ long[][string] functions(in int nruns = 10)
     {
         sw.reset;
         sw.start;
-        for (int j; j < 50; ++j)
+        for (int j; j < 500; ++j)
         {
             double[][] res = elementWiseOP!double(OPS.mul, smallArrOfArraysA, smallArrOfArraysB);
         }
@@ -253,7 +253,7 @@ long[][string] functions(in int nruns = 10)
     {
         sw.reset;
         sw.start;
-        for (int j; j < 50; ++j)
+        for (int j; j < 500; ++j)
         {
             auto res = matrixElementWiseOp!int(OPS.sum, smallIntMatrixA, smallIntMatrixB).to2D;
         }
@@ -267,7 +267,7 @@ long[][string] functions(in int nruns = 10)
     {
         sw.reset;
         sw.start;
-        for (int j; j < 50; ++j)
+        for (int j; j < 500; ++j)
         {
             auto res = matrixElementWiseOp!double(OPS.mul, smallMatrixA, smallMatrixB).to2D;
         }

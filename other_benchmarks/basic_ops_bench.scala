@@ -1,8 +1,8 @@
 import util.Random.nextInt
 
 class BenchmarkOps {
-  final val rows = 5000
-  final val cols = 6000
+  final val rows = 500
+  final val cols = 600
 
   def getRandomIntMatrix: Array[Array[Int]] =
     Array.fill(rows, cols) {
