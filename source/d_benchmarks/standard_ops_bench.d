@@ -20,10 +20,8 @@ TEST: dub run --compiler=ldc2 --build=tests
 */
 
 import core.memory : GC;
-import core.thread : Thread;
-import std.algorithm : fill, joiner, map, sort, sum, SwapStrategy;
+import std.algorithm : each, fill, joiner, map, sort, sum, SwapStrategy;
 import std.array : array;
-import std.datetime : Duration, dur;
 import std.datetime.stopwatch : AutoStart, StopWatch;
 import std.format : format;
 import std.math : pow, sqrt;
@@ -170,9 +168,9 @@ double squareL2Norm(T)(Matrix!T m)
     return m.data.map!(a => a.pow(2)).sum.sqrt;
 }
 
-Matrix!T standardSort(T)(Matrix!T m)
+Matrix!T columnWiseSort(T)(Matrix!T m)
 {
-    m.data = sort!("a < b", SwapStrategy.unstable)(m.data).array;
+    m.to2D.each!(row => sort!("a < b", SwapStrategy.unstable)(row));
     return m;
 }
 
@@ -187,26 +185,29 @@ void reportTime(StopWatch sw, string msg)
 long[][string] functions(in int nruns = 10)
 {
     auto sw = StopWatch(AutoStart.no);
-    Duration sleepTime = dur!"msecs"(500);
-    const int rows = 5000;
-    const int cols = 6000;
+    const rows = 5000;
+    const cols = 6000;
+    const reduceRowsBy = 5;
+    const reduceColsBy = 6;
 
     const dotRows = 1000;
     const dotCols = 500;
 
-    int[][] smallIntArrOfArraysA = getRandomAArray!int(10, rows / 20, cols / 30);
-    int[][] smallIntArrOfArraysB = getRandomAArray!int(10, rows / 20, cols / 30);
-    double[][] smallArrOfArraysA = getRandomAArray!double(1.0, rows / 20, cols / 30);
-    double[][] smallArrOfArraysB = getRandomAArray!double(1.0, rows / 20, cols / 30);
-    auto smallIntMatrixA = Matrix!int(rows / 20, cols / 30,
-            getRandomArray!int(10, (rows / 20) * (cols / 30)));
-    auto smallIntMatrixB = Matrix!int(rows / 20, cols / 30,
-            getRandomArray!int(10, (rows / 20) * (cols / 30)));
-    auto smallMatrixA = Matrix!double(rows / 20, cols / 30,
-            getRandomArray!double(1.0, (rows / 20) * (cols / 30)));
+    int[][] smallIntArrOfArraysA = getRandomAArray!int(10, rows / reduceRowsBy, cols / reduceColsBy);
+    int[][] smallIntArrOfArraysB = getRandomAArray!int(10, rows / reduceRowsBy, cols / reduceColsBy);
+    double[][] smallArrOfArraysA = getRandomAArray!double(1.0,
+            rows / reduceRowsBy, cols / reduceColsBy);
+    double[][] smallArrOfArraysB = getRandomAArray!double(1.0,
+            rows / reduceRowsBy, cols / reduceColsBy);
+    auto smallIntMatrixA = Matrix!int(rows / reduceRowsBy, cols / reduceColsBy,
+            getRandomArray!int(10, (rows / reduceRowsBy) * (cols / reduceColsBy)));
+    auto smallIntMatrixB = Matrix!int(rows / reduceRowsBy, cols / reduceColsBy,
+            getRandomArray!int(10, (rows / reduceRowsBy) * (cols / reduceColsBy)));
+    auto smallMatrixA = Matrix!double(rows / reduceRowsBy, cols / reduceColsBy,
+            getRandomArray!double(1.0, (rows / reduceRowsBy) * (cols / reduceColsBy)));
 
-    auto smallMatrixB = Matrix!double(rows / 20, cols / 30,
-            getRandomArray!double(1.0, (rows / 20) * (cols / 30)));
+    auto smallMatrixB = Matrix!double(rows / reduceRowsBy, cols / reduceColsBy,
+            getRandomArray!double(1.0, (rows / reduceRowsBy) * (cols / reduceColsBy)));
 
     auto arrayA = getRandomArray!double(1.0, rows * cols);
     auto arrayB = getRandomArray!double(1.0, rows * cols);
@@ -218,64 +219,60 @@ long[][string] functions(in int nruns = 10)
     auto matrixD = Matrix!double(rows, cols, getRandomArray!double(1.0, rows * cols));
 
     long[][string] funcs;
-    string name0 = format("Element-wise sum of two [%sx%s] arrays of arrays (int), (200 loops)",
-            rows / 20, cols / 30);
+    string name0 = format("Element-wise sum of two [%sx%s] arrays of arrays (int), (50 loops)",
+            rows / reduceRowsBy, cols / reduceColsBy);
     for (int i; i < nruns; ++i)
     {
         sw.reset;
         sw.start;
-        for (int j; j < 200; ++j)
+        for (int j; j < 50; ++j)
         {
             int[][] res = elementWiseOP!int(OPS.sum, smallIntArrOfArraysA, smallIntArrOfArraysB);
         }
         sw.stop;
         funcs[name0] ~= sw.peek.total!"nsecs";
-        Thread.sleep(sleepTime);
     }
 
-    string name1 = format("Element-wise multiplication of two [%sx%s] arrays of arrays (double), (200 loops)",
-            rows / 20, cols / 30);
+    string name1 = format("Element-wise multiplication of two [%sx%s] arrays of arrays (double), (50 loops)",
+            rows / reduceRowsBy, cols / reduceColsBy);
     for (int i; i < nruns; ++i)
     {
         sw.reset;
         sw.start;
-        for (int j; j < 200; ++j)
+        for (int j; j < 50; ++j)
         {
             double[][] res = elementWiseOP!double(OPS.mul, smallArrOfArraysA, smallArrOfArraysB);
         }
         sw.stop;
         funcs[name1] ~= sw.peek.total!"nsecs";
-        Thread.sleep(sleepTime);
     }
 
-    string name2 = format("Element-wise sum of two [%sx%s] struct matrices (int), (200 loops)",
-            rows / 20, cols / 30);
+    string name2 = format("Element-wise sum of two [%sx%s] struct matrices (int), (50 loops)",
+            rows / reduceRowsBy, cols / reduceColsBy);
     for (int i; i < nruns; ++i)
     {
         sw.reset;
         sw.start;
-        for (int j; j < 200; ++j)
+        for (int j; j < 50; ++j)
         {
             auto res = matrixElementWiseOp!int(OPS.sum, smallIntMatrixA, smallIntMatrixB).to2D;
         }
         sw.stop;
         funcs[name2] ~= sw.peek.total!"nsecs";
-        Thread.sleep(sleepTime);
     }
 
-    string name3 = format("Element-wise multiplication of two [%sx%s] struct matrices (double), (200 loops)",
-            rows / 20, cols / 30);
+    string name3 = format("Element-wise multiplication of two [%sx%s] struct matrices (double), (50 loops)",
+            rows / reduceRowsBy, cols / reduceColsBy);
     for (int i; i < nruns; ++i)
     {
         sw.reset;
         sw.start;
-        for (int j; j < 200; ++j)
+        for (int j; j < 50; ++j)
         {
             auto res = matrixElementWiseOp!double(OPS.mul, smallMatrixA, smallMatrixB).to2D;
         }
         sw.stop;
         funcs[name3] ~= sw.peek.total!"nsecs";
-        Thread.sleep(sleepTime);
     }
 
     string name4 = format("Scalar product of two [%s] arrays (double)", rows * cols);
@@ -286,7 +283,6 @@ long[][string] functions(in int nruns = 10)
         auto res = dotProduct(arrayA, arrayB);
         sw.stop;
         funcs[name4] ~= sw.peek.total!"nsecs";
-        Thread.sleep(sleepTime);
     }
 
     /* 
@@ -303,7 +299,6 @@ long[][string] functions(in int nruns = 10)
         auto res = matrixDotProduct!double(matrixA, matrixB, initMatrix);
         sw.stop;
         funcs[name5] ~= sw.peek.total!"nsecs";
-        Thread.sleep(sleepTime);
     }
 
     string name6 = format("L2 norm of [%sx%s] struct matrix (double)", rows, cols);
@@ -314,19 +309,16 @@ long[][string] functions(in int nruns = 10)
         auto res = squareL2Norm(matrixC);
         sw.stop;
         funcs[name6] ~= sw.peek.total!"nsecs";
-        Thread.sleep(sleepTime);
     }
 
-    string name7 = format("(Reference only) destructive sort of [%sx%s] struct matrix (double)",
-            rows, cols);
+    string name7 = format("Sort of [%sx%s] struct matrix (double)", rows, cols);
     for (int i; i < nruns; ++i)
     {
         sw.reset;
         sw.start;
-        auto res = standardSort(matrixD).to2D;
+        auto res = columnWiseSort(matrixD).to2D;
         sw.stop;
         funcs[name7] ~= sw.peek.total!"nsecs";
-        Thread.sleep(sleepTime);
     }
 
     return funcs;
@@ -340,7 +332,7 @@ void runStandardBenchmarks()
     {
         // convert nsec. to sec. and compute the average
         const double secs = pair.value.map!(a => a / pow(1000.0, 3)).sum / pair.value.length;
-        writeln(format("%s --> %s sec.", pair.key, secs));
+        writeln(format("| %s | %s |", pair.key, secs));
     }
 }
 

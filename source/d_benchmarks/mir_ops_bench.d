@@ -1,6 +1,5 @@
 module mir_ops_bench;
 
-import core.thread : Thread;
 import mir.blas : gemm;
 import mir.math.common : pow, sqrt;
 import mir.math.common : fastmath, optmath;
@@ -11,13 +10,13 @@ import mir.random : Random, threadLocalPtr;
 import mir.random.algorithm : randomSlice;
 import mir.random.variable : normalVar, uniformVar;
 import std.array : array;
-import std.datetime : dur, Duration;
 import std.datetime.stopwatch : AutoStart, StopWatch;
 import std.format : format;
 import std.stdio;
 
 alias SliceArr = mir_slice!(double*, 1LU, cast(mir_slice_kind) 2);
 alias SliceMatrix = Slice!(double*, 2LU, cast(mir_slice_kind) 2);
+alias SliceMatrixArr = Slice!(double*, 2LU, cast(mir_slice_kind) 2)[];
 
 pragma(inline) static @optmath fmuladd(T, Z)(const T a, Z z)
 {
@@ -66,17 +65,19 @@ long[][string] functions(in int nruns = 10)
     __gshared double gsharedRes2;
 
     auto sw = StopWatch(AutoStart.no);
-    Duration sleepTime = dur!"msecs"(500);
     const rows = 5000;
     const cols = 6000;
+    const reduceRowsBy = 5;
+    const reduceColsBy = 6;
+
     auto smallIntMatrixA = threadLocalPtr!Random.randomSlice(uniformVar!int(1,
-            10), [rows / 20, cols / 30]);
+            10), [rows / reduceRowsBy, cols / reduceColsBy]);
     auto smallIntMatrixB = threadLocalPtr!Random.randomSlice(uniformVar!int(1,
-            10), [rows / 20, cols / 30]);
+            10), [rows / reduceRowsBy, cols / reduceColsBy]);
     auto smallMatrixA = threadLocalPtr!Random.randomSlice(uniformVar!double(0.0,
-            1.0), [rows / 20, cols / 30]);
+            1.0), [rows / reduceRowsBy, cols / reduceColsBy]);
     auto smallMatrixB = threadLocalPtr!Random.randomSlice(uniformVar!double(0.0,
-            1.0), [rows / 20, cols / 30]);
+            1.0), [rows / reduceRowsBy, cols / reduceColsBy]);
     auto matrixA = threadLocalPtr!Random.randomSlice(uniformVar!double(0.0, 1.0), [
             rows, cols
             ]);
@@ -92,35 +93,33 @@ long[][string] functions(in int nruns = 10)
     long[][string] funcs;
 
     /// Element-wise sum of two int Slices.
-    string name0 = format("Element-wise sum of two [%sx%s] slices (int), (200 loops)",
-            rows / 20, cols / 30);
+    string name0 = format("Element-wise sum of two [%sx%s] slices (int), (50 loops)",
+            rows / reduceRowsBy, cols / reduceColsBy);
     for (int i; i < nruns; ++i)
     {
         sw.reset;
         sw.start;
-        for (int j; j < 200; ++j)
+        for (int j; j < 50; ++j)
         {
             auto res = (smallIntMatrixA + smallIntMatrixB).array;
         }
         sw.stop;
         funcs[name0] ~= sw.peek.total!"nsecs"; // div by 1000^3 to get sec.
-        Thread.sleep(sleepTime);
     }
 
     /// Element-wise multiplication of two double Slices.
-    string name1 = format("Element-wise multiplication of two [%sx%s] slices (double), (200 loops)",
-            rows / 20, cols / 30);
+    string name1 = format("Element-wise multiplication of two [%sx%s] slices (double), (50 loops)",
+            rows / reduceRowsBy, cols / reduceColsBy);
     for (int i; i < nruns; ++i)
     {
         sw.reset;
         sw.start;
-        for (int j; j < 200; ++j)
+        for (int j; j < 50; ++j)
         {
             auto res = (smallMatrixA * smallMatrixB).array;
         }
         sw.stop;
         funcs[name1] ~= sw.peek.total!"nsecs";
-        Thread.sleep(sleepTime);
     }
 
     /// Scalar product of two double Slices.
@@ -132,7 +131,6 @@ long[][string] functions(in int nruns = 10)
         gsharedRes0 = scalarProduct(sliceA, sliceB);
         sw.stop;
         funcs[name2] ~= sw.peek.total!"nsecs";
-        Thread.sleep(sleepTime);
     }
 
     /// Scalar product of two double arrays (plain loop).
@@ -144,7 +142,6 @@ long[][string] functions(in int nruns = 10)
         gsharedRes1 = loopedScalarProduct(sliceA, sliceB);
         sw.stop;
         funcs[name3] ~= sw.peek.total!"nsecs";
-        Thread.sleep(sleepTime);
     }
 
     /// Dot product of two double 2D slices.
@@ -158,7 +155,6 @@ long[][string] functions(in int nruns = 10)
         gemm(1.0, matrixA, matrixC, 0, matrixD);
         sw.stop;
         funcs[name4] ~= sw.peek.total!"nsecs";
-        Thread.sleep(sleepTime);
     }
 
     /// L2 norm of double Slice.
@@ -170,7 +166,6 @@ long[][string] functions(in int nruns = 10)
         gsharedRes2 = squareL2Norm(matrixB);
         sw.stop;
         funcs[name5] ~= sw.peek.total!"nsecs";
-        Thread.sleep(sleepTime);
     }
 
     /// Sort of double Slice along axis=0.
@@ -185,7 +180,6 @@ long[][string] functions(in int nruns = 10)
             .each!sort;
         sw.stop;
         funcs[name6] ~= sw.peek.total!"nsecs";
-        Thread.sleep(sleepTime);
     }
 
     return funcs;
@@ -199,6 +193,6 @@ void runMirBenchmarks()
     {
         // convert nsec. to sec. and compute the average
         const double secs = pair.value.map!(a => a / pow(1000.0, 3)).sum / pair.value.length;
-        writeln(format("%s --> %s sec.", pair.key, secs));
+        writeln(format("| %s | %s |", pair.key, secs));
     }
 }
