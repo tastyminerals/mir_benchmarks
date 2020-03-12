@@ -19,7 +19,7 @@ Each benchmark was run 20 times with 0.5 sec. timeout, the timings were then col
 
 ### Numpy (BLAS)
 
-| Benchmark                                                                  | Time (sec.)          |
+| Description                                                                  | Time (sec.)          |
 | -------------------------------------------------------------------------- | -------------------- |
 | Element-wise sum of two 250x200 matrices (int), (200 loops)                | 0.01051435709987345  |
 | Element-wise multiplication of two 250x200 matrices (float64), (200 loops) | 0.007941059350105206 |
@@ -31,7 +31,7 @@ Each benchmark was run 20 times with 0.5 sec. timeout, the timings were then col
 
 ### Standard D
 
-| Benchmark                                                                           | Time (sec.) |
+| Description                                                                           | Time (sec.) |
 | ----------------------------------------------------------------------------------- | ----------- |
 | Element-wise sum of two [250x200] arrays of arrays (int), (200 loops)               | 0.0747522   |
 | Element-wise multiplication of two [250x200] arrays of arrays (double), (200 loops) | 0.0735269   |
@@ -45,7 +45,7 @@ Each benchmark was run 20 times with 0.5 sec. timeout, the timings were then col
 
 ### Mir D
 
-| Benchmark                                                                 | Time (sec.) |
+| Description                                                                 | Time (sec.) |
 | ------------------------------------------------------------------------- | ----------- |
 | Element-wise sum of two [250x200] slices (int), (200 loops)               | 0.00239246  |
 | Element-wise multiplication of two [250x200] slices (double), (200 loops) | 0.00257717  |
@@ -60,7 +60,7 @@ Each benchmark was run 20 times with 0.5 sec. timeout, the timings were then col
 Although our unoptimized dot product implementation is pretty fast with small to medium sized matrices it becomes prohibitively slow with big matrices.
 Numpy uses well-known BLAS [general matrix multiplication `gemm`](https://software.intel.com/en-us/mkl-developer-reference-fortran-gemm) routine which does not have this issue.
 
-| unoptimized dot product of struct matrices | time (sec.) |
+| Unoptimized dot product of struct matrices | Time (sec.) |
 | ------------------------------------------ | ----------: |
 | 2 x [100 x 100]                            |        0.01 |
 | 2 x [1000 x 1000]                          |        2.21 |
