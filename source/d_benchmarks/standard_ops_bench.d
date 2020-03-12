@@ -310,7 +310,7 @@ long[][string] functions(in int nruns = 10)
     {
         sw.reset;
         sw.start;
-        auto res = columnWiseSort(matrixD).to2D;
+        auto res = columnWiseSort(matrixD);
         sw.stop;
         funcs[name7] ~= sw.peek.total!"nsecs";
     }
