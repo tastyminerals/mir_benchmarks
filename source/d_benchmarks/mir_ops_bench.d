@@ -193,6 +193,7 @@ long[][string] functions(in int nruns = 10)
 
 void runMirBenchmarks()
 {
+    writeln("---[Mir D]---");
     auto timings = functions(20);
     foreach (pair; timings.byKeyValue)
     {

@@ -9,6 +9,6 @@ void main()
     // basic_ops.arrays;
     // basic_ops.mirArrays;
     // basic_ops.basicOps;
-    // runStandardBenchmarks;
+    runStandardBenchmarks;
     runMirBenchmarks;
 }

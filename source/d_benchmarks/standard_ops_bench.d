@@ -334,6 +334,7 @@ long[][string] functions(in int nruns = 10)
 
 void runStandardBenchmarks()
 {
+    writeln("---[Standard D]---");
     auto timings = functions(20);
     foreach (pair; timings.byKeyValue)
     {
