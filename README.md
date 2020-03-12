@@ -20,70 +20,51 @@ python other_benchmarks/basic_ops_bench.py
 
 ### Benchmarks Yay!
 
-| Description                                                                          | Numpy (BLAS) (sec.) | Standard D (sec.)  | Mir D (sec.)         |
-| ------------------------------------------------------------------------------------ | ------------------- | ------------------ | -------------------- |
-| Element-wise sum of two 250x200 matrices (int), (50 loops)                           | 0.00115             | 0.00400213 (x3.5)  | 0.00014372 (x1/8)    |
-| Element-wise multiplication of two 250x200 matrices (float64/double), (50 loops)     | 0.0011578           | 0.0132323 (x11.4)  | 0.00013852 (x1/8.3)  |
-| Element-wise sum of two 500x600 matrices (int), (50 loops)                           | 0.0101275           | 0.016496 (x1.6)    | 0.00021556 (x1/47)   |
-| Element-wise multiplication of two 500x600 matrices (float64/double), (50 loops)     | 0.010182            | 0.06857 (x6.7)     | 0.00021717 (x1/47)   |
-| Element-wise sum of two 1k x 1k matrices (int), (50 loops)                           | 0.0493201           | 0.0614544 (x1.3)   | 0.000422135 (x1/117) |
-| Element-wise multiplication of two 1k x 1k matrices (float64/double), (50 loops)     | 0.0493693           | 0.233827 (x4.7)    | 0.000453535 (x1/109) |
-| Scalar product of two 30000000 arrays (float64/double)                               | 0.0152186           | 0.0227465 (x1.5)   | 0.0198812 (x1.3)     |
-| Dot product of 5000x6000 and 6000x5000 matrices (float64/double), (BLAS vs OpenBLAS) | 1.6084685           | ---                | 2.03398 (x1.2)       |
-| L2 norm of 5000x6000 matrix (float64/double)                                         | 0.0072423           | 0.0160546 (x2.2)   | 0.0110136 (x1.6)     |
-| Quicksort of 5000x6000 matrix (float64/double)                                       | 2.6516816           | 0.178071 (x1/14.8) | 1.52406 (x1/0.6)     |
+| Description                                                                 | Numpy (BLAS) (sec.)   | Standard D (sec.)    | Mir D (sec.)         |
+| --------------------------------------------------------------------------- | --------------------- | -------------------- | -------------------- |
+| Element-wise sum of two 100x100 matrices (int), (1000 loops)                | 0.0037406866998935585 | 0.00391301 (x1.1)    | 0.00135104 (x1/2.8)  |
+| Element-wise multiplication of two 100x100 matrices (float64), (1000 loops) | 0.004177645951131126  | 0.0386691 (x9.3)     | 0.00310666 (x1/0.7)  |
+| Scalar product of two 300000 arrays (float64)                               | 0.0001648812492931029 | 0.00018331 (x1.1)    | 0.000112205 (x1/1.5) |
+| Dot product of 500x600 and 600x500 matrices (float64)                       | 0.0018967882002471014 | 0.171296 (x90.3)     | 0.00224537 (x1.2)    |
+| L2 norm of 500x600 matrix (float64)                                         | 3.248330031055957e-05 | 0.00013854 (x4.3)    | 6.749e-05 (x1/0.5)   |
+| Sort of 500x600 matrix (float64)                                            | 0.020701468300103443  | 0.00121251 (x1/17.1) | 0.00981535 (x1/2.1)  |
 
 ##### Numpy (BLAS)
 
 | Description                                                                 | Time (sec.)           |
 | --------------------------------------------------------------------------- | --------------------- |
-| Element-wise sum of two 250x200 matrices (int), (50 loops)                  | 0.0011499844000354641 |
-| Element-wise multiplication of two 250x200 matrices (float64), (50 loops)   | 0.0011577772499094864 |
-| Element-wise sum of two 500x600 matrices (int), (50 loops)                  | 0.010127495700044165  |
-| Element-wise multiplication of two 500x600 matrices (float64), (50 loops)   | 0.010181960850013638  |
-| Element-wise sum of two 1000x1000 matrices (int), (50 loops)                | 0.04932012745002794   |
-| Element-wise multiplication of two 1000x1000 matrices (float64), (50 loops) | 0.04936937039983604   |
-| Scalar product of two 30000000 arrays (float64)                             | 0.015218639799968514  |
-| Dot product of 5000x6000 and 6000x5000 matrices (float64)                   | 1.6084685370500664    |
-| L2 norm of 5000x6000 matrix (float64)                                       | 0.007242295700052637  |
-| Sort of 5000x6000 matrix (float64)                                          | 2.6516815754499476    |
+| Element-wise sum of two 100x100 matrices (int), (1000 loops)                | 0.0037406866998935585 |
+| Element-wise multiplication of two 100x100 matrices (float64), (1000 loops) | 0.004177645951131126  |
+| Scalar product of two 300000 arrays (float64)                               | 0.0001648812492931029 |
+| Dot product of 500x600 and 600x500 matrices (float64)                       | 0.0018967882002471014 |
+| L2 norm of 500x600 matrix (float64)                                         | 3.248330031055957e-05 |
+| Sort of 500x600 matrix (float64)                                            | 0.020701468300103443  |
 
 ##### Standard D
 
-| Description                                                                                                     | Time (sec.) |
-| --------------------------------------------------------------------------------------------------------------- | ----------- |
-| Element-wise sum of two [250x200] arrays of arrays (int), (50 loops)                                            | 0.0164181   |
-| Element-wise multiplication of two [250x200] arrays of arrays (double), (50 loops)                              | 0.0173038   |
-| Element-wise sum of two [500x600] arrays of arrays (int), (50 loops)                                            | 0.0975254   |
-| Element-wise multiplication of two [500x600] arrays of arrays (double), (50 loops)                              | 0.0963054   |
-| Element-wise sum of two [250x200] struct matrices (int), (50 loops)                                             | 0.00400213  |
-| Element-wise multiplication of two [250x200] struct matrices (double), (50 loops)                               | 0.0132323   |
-| Element-wise sum of two [500x600] struct matrices (int), (50 loops)                                             | 0.016496    |
-| Element-wise multiplication of two [500x600] struct matrices (double), (50 loops)                               | 0.06857     |
-| Element-wise sum of two [1000x1000] arrays of arrays (int), (50 loops)                                          | 0.386411    |
-| Element-wise multiplication of two [1000x1000] arrays of arrays (double), (50 loops)                            | 0.428913    |
-| Element-wise sum of two [1000x1000] struct matrices (int), (50 loops)                                           | 0.0614544   |
-| Element-wise multiplication of two [1000x1000] struct matrices (double), (50 loops)                             | 0.233827    |
-| Scalar product of two [30000000] arrays (double)                                                                | 0.0227465   |
-| (Reference only) [unoptimized](#unoptimized-dot-product) dot product of two [1000x500] struct matrices (double) | 0.567586    |
-| L2 norm of [5000x6000] struct matrix (double)                                                                   | 0.0160546   |
-| Sort of [5000x6000] struct matrix (double)                                                                      | 0.178071    |
+| Description                                                                          | Time (sec.) |
+| ------------------------------------------------------------------------------------ | ----------- |
+| (Reference only) unoptimized dot product of two [500x600] struct matrices (double)   | 0.171296    |
+| Element-wise multiplication of two [100x100] arrays of arrays (double), (1000 loops) | 0.0739148   |
+| Element-wise multiplication of two [100x100] struct matrices (double), (1000 loops)  | 0.0386691   |
+| Element-wise sum of two [100x100] arrays of arrays (int), (1000 loops)               | 0.0743575   |
+| Element-wise sum of two [100x100] struct matrices (int), (1000 loops)                | 0.00391301  |
+| L2 norm of [500x600] struct matrix (double)                                          | 0.00013854  |
+| Scalar product of two [300000] arrays (double)                                       | 0.00018331  |
+| Sort of [500x600] struct matrix (double)                                             | 0.00121251  |
+
 
 ##### Mir D
 
 | Description                                                                | Time (sec.) |
 | -------------------------------------------------------------------------- | ----------- |
-| Element-wise sum of two [250x200] slices (int), (50 loops)                 | 0.00014372  |
-| Element-wise multiplication of two [250x200] slices (double), (50 loops)   | 0.00013852  |
-| Element-wise sum of two [500x600] slices (int), (50 loops)                 | 0.00021556  |
-| Element-wise multiplication of two [500x600] slices (double), (50 loops)   | 0.00021717  |
-| Element-wise sum of two [1000x1000] slices (int), (50 loops)               | 0.000422135 |
-| Element-wise multiplication of two [1000x1000] slices (double), (50 loops) | 0.000453535 |
-| Scalar product of two [30000000] slices (double)                           | 0.0198812   |
-| Scalar product of two [30000000] slices (double), (plain loop)             | 0.0199915   |
-| L2 norm of [5000x6000] slice (double)                                      | 0.0110136   |
-| Dot product of two [5000x6000] and [6000x5000] slices (double)             | 2.03398     |
-| Sort of [5000x6000] slice (double)                                         | 1.52406     |
+| Element-wise sum of two [100x100] slices (int), (1000 loops)               | 0.00135104  |
+| Element-wise multiplication of two [100x100] slices (double), (1000 loops) | 0.00310666  |
+| Dot product of two [500x600] and [600x500] slices (double)                 | 0.00224537  |
+| L2 norm of [500x600] slice (double)                                        | 6.749e-05   |
+| Scalar product of two [300000] slices (double)                             | 0.000112205 |
+| Scalar product of two [300000] slices (double), (plain loop)               | 9.573e-05   |
+| Sort of [500x600] slice (double)                                           | 0.00981535  |
 
 ##### Unoptimized Dot Product
 Although our dot product implementation is pretty fast with small to medium sized matrices it becomes prohibitively slow with big matrices.

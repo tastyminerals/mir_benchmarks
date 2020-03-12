@@ -198,7 +198,7 @@ long[][string] functions(in int nruns = 10)
     auto matrix = uniformVar!double(-1.0, 1.0).randomSlice([rows, cols]);
     for (int i; i < nruns; ++i)
     {
-        // shufle the matrix
+        // shuffle the matrix
         matrix.flattened.shuffle;
         sw.reset;
         sw.start;

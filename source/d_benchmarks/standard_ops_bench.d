@@ -20,6 +20,7 @@ TEST: dub run --compiler=ldc2 --build=tests
 */
 
 import core.memory : GC;
+import mir.math.common : fastmath, optmath;
 import std.algorithm : each, fill, joiner, map, sort, sum, SwapStrategy;
 import std.array : array;
 import std.datetime.stopwatch : AutoStart, StopWatch;
@@ -62,7 +63,7 @@ struct Matrix(T)
         this.cols = cols;
     }
 
-    T[][] to2D()
+    @fastmath T[][] to2D()
     {
         return this.data.chunks(this.cols).array;
     }
@@ -73,7 +74,7 @@ struct Matrix(T)
     }
 
     /// Allow element 2D indexing, e.g. Matrix[row, col]
-    T opIndex(in int r, in int c)
+    @fastmath T opIndex(in int r, in int c)
     {
         return this.data[this.cols * r + c];
     }
@@ -95,7 +96,7 @@ static T[][] getRandomAArray(T)(in T max, in int rows, in int cols)
     return generate(() => uniform(0, max, rnd)).take(amount).array.chunks(cols).array;
 }
 
-T[][] elementWiseOP(T)(string op, T[][] arr1, T[][] arr2)
+@fastmath T[][] elementWiseOP(T)(string op, T[][] arr1, T[][] arr2)
 {
     T[][] arr3;
     switch (op)
@@ -117,7 +118,7 @@ T[][] elementWiseOP(T)(string op, T[][] arr1, T[][] arr2)
     return arr3;
 }
 
-auto matrixElementWiseOp(T)(string op, Matrix!T m1, Matrix!T m2)
+@fastmath auto matrixElementWiseOp(T)(string op, Matrix!T m1, Matrix!T m2)
 in
 {
     assert(m1.rows == m2.rows);
@@ -142,7 +143,7 @@ do
 }
 
 /// [2 x 3]@[3 x 2]-- > [2 x 2], slow
-Matrix!T matrixDotProduct(T)(Matrix!T m1, Matrix!T m2, Matrix!T initM)
+@fastmath Matrix!T matrixDotProduct(T)(Matrix!T m1, Matrix!T m2, Matrix!T initM)
 in
 {
     assert(m1.rows == m2.cols);
@@ -163,22 +164,15 @@ do
     return initM;
 }
 
-double squareL2Norm(T)(Matrix!T m)
+@fastmath double squareL2Norm(T)(Matrix!T m)
 {
     return m.data.map!(a => a.pow(2)).sum.sqrt;
 }
 
-Matrix!T columnWiseSort(T)(Matrix!T m)
+@fastmath Matrix!T columnWiseSort(T)(Matrix!T m)
 {
     m.to2D.each!(row => sort!("a < b", SwapStrategy.unstable)(row));
     return m;
-}
-
-void reportTime(StopWatch sw, string msg)
-{
-    auto msecs = sw.peek.total!"msecs";
-    auto usecs = sw.peek.total!"usecs";
-    writeln(format(msg ~ ": %s sec. %s msec.", msecs / 1000.0, usecs / 1000.0));
 }
 
 /// Measure only op execution excluding the time for matrix/slice allocations.
