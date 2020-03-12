@@ -20,8 +20,10 @@ TEST: dub run --compiler=ldc2 --build=tests
 */
 
 import core.memory : GC;
-import std.algorithm : joiner, fill, map, sort, sum, SwapStrategy;
+import core.thread : Thread;
+import std.algorithm : fill, joiner, map, sort, sum, SwapStrategy;
 import std.array : array;
+import std.datetime : Duration, dur;
 import std.datetime.stopwatch : AutoStart, StopWatch;
 import std.format : format;
 import std.math : pow, sqrt;
@@ -87,7 +89,7 @@ static T[] getRandomArray(T)(in T max, in int elems)
     return generate(() => uniform(0, max, rnd)).take(elems).array;
 }
 
-static T[][] getRandom2DArray(T)(in T max, in int rows, in int cols)
+static T[][] getRandomAArray(T)(in T max, in int rows, in int cols)
 {
     Xorshift rnd;
     rnd.seed(unpredictableSeed);
@@ -181,89 +183,168 @@ void reportTime(StopWatch sw, string msg)
     writeln(format(msg ~ ": %s sec. %s msec.", msecs / 1000.0, usecs / 1000.0));
 }
 
-void runStandardBenchmarks()
+/// Measure only op execution excluding the time for matrix/slice allocations.
+long[][string] functions(in int nruns = 10)
 {
     auto sw = StopWatch(AutoStart.no);
-    int rows = 5000;
-    int cols = 6000;
+    Duration sleepTime = dur!"msecs"(500);
+    const int rows = 5000;
+    const int cols = 6000;
 
-    /// Element-wise sum of 2x[rows, cols] random 2D int arrays.
-    int[][] arr2D1 = getRandom2DArray!int(10, rows, cols);
-    int[][] arr2D2 = getRandom2DArray!int(10, rows, cols);
-    sw.start;
-    int[][] a = elementWiseOP!int(OPS.sum, arr2D1, arr2D2);
-    sw.stop;
-    reportTime(sw, format("Element-wise sum of two %sx%s int arrays", rows, cols));
+    const dotRows = 1000;
+    const dotCols = 500;
 
-    /// Element-wise multiplication of 2x[rows, cols] random 2D double arrays.
-    double[][] arr2D3 = getRandom2DArray!double(1.0, rows, cols);
-    double[][] arr2D4 = getRandom2DArray!double(1.0, rows, cols);
-    sw.reset;
-    sw.start;
-    double[][] b = elementWiseOP(OPS.mul, arr2D3, arr2D4);
-    sw.stop;
-    reportTime(sw, format("Element-wise multiplication of two %sx%s double arrays", rows, cols));
+    int[][] smallIntArrOfArraysA = getRandomAArray!int(10, rows / 20, cols / 30);
+    int[][] smallIntArrOfArraysB = getRandomAArray!int(10, rows / 20, cols / 30);
+    double[][] smallArrOfArraysA = getRandomAArray!double(1.0, rows / 20, cols / 30);
+    double[][] smallArrOfArraysB = getRandomAArray!double(1.0, rows / 20, cols / 30);
+    auto smallIntMatrixA = Matrix!int(rows / 20, cols / 30,
+            getRandomArray!int(10, (rows / 20) * (cols / 30)));
+    auto smallIntMatrixB = Matrix!int(rows / 20, cols / 30,
+            getRandomArray!int(10, (rows / 20) * (cols / 30)));
+    auto smallMatrixA = Matrix!double(rows / 20, cols / 30,
+            getRandomArray!double(1.0, (rows / 20) * (cols / 30)));
 
-    /// Element-wise sum of 2x[rows, cols] random int Matrices.
-    auto m1 = Matrix!int(rows, cols, getRandomArray!int(10, rows * cols));
-    auto m2 = Matrix!int(rows, cols, getRandomArray!int(10, rows * cols));
-    sw.reset;
-    sw.start;
-    auto c = matrixElementWiseOp!int(OPS.sum, m1, m2).to2D;
-    sw.stop;
-    reportTime(sw, format("Element-wise sum of two %sx%s int Matrices", rows, cols));
+    auto smallMatrixB = Matrix!double(rows / 20, cols / 30,
+            getRandomArray!double(1.0, (rows / 20) * (cols / 30)));
 
-    /// Element-wise multiplication of 2x[rows, cols] random double Matrices.
-    auto m3 = Matrix!double(rows, cols, getRandomArray!double(1.0, rows * cols));
-    auto m4 = Matrix!double(rows, cols, getRandomArray!double(1.0, rows * cols));
-    sw.reset;
-    sw.start;
-    auto d = matrixElementWiseOp!double(OPS.mul, m3, m4).to2D;
-    sw.stop;
-    reportTime(sw, format("Element-wise multiplication of two %sx%s double Matrices", rows, cols));
+    auto arrayA = getRandomArray!double(1.0, rows * cols);
+    auto arrayB = getRandomArray!double(1.0, rows * cols);
 
-    /// Scalar dot product of two random double arrays.
-    auto vec0 = getRandomArray!double(1.0, rows * cols);
-    auto vec1 = getRandomArray!double(1.0, rows * cols);
-    sw.reset;
-    sw.start;
-    auto h = dotProduct(vec0, vec1);
-    sw.stop;
-    reportTime(sw, format("Scalar product of two %s double arrays", rows * cols));
+    auto matrixA = Matrix!double(dotRows, dotCols, getRandomArray!double(1.0, dotRows * dotCols));
+    auto matrixB = Matrix!double(dotCols, dotRows, getRandomArray!double(1.0, dotRows * dotCols));
 
-    /// Dot product of two random double Matrices, we pick smaller arrays for speed.
-    const int dotRows = 500;
-    const int dotCols = 1000;
-    auto m5 = Matrix!double(dotRows, dotCols, getRandomArray!double(1.0, dotRows * dotCols));
-    auto m6 = Matrix!double(dotCols, dotRows, getRandomArray!double(1.0, dotRows * dotCols));
-    sw.reset;
-    sw.start;
+    auto matrixC = Matrix!double(rows, cols, getRandomArray!double(1.0, rows * cols));
+    auto matrixD = Matrix!double(rows, cols, getRandomArray!double(1.0, rows * cols));
 
-    Matrix!double initMatrix = Matrix!double(m5.rows, m6.cols);
-    auto e = matrixDotProduct!double(m5, m6, initMatrix);
-    sw.stop;
-    reportTime(sw, "Dot product of double Matrices");
+    long[][string] funcs;
+    string name0 = format("Element-wise sum of two [%sx%s] arrays of arrays (int), (200 loops)",
+            rows / 20, cols / 30);
+    for (int i; i < nruns; ++i)
+    {
+        sw.reset;
+        sw.start;
+        for (int j; j < 200; ++j)
+        {
+            int[][] res = elementWiseOP!int(OPS.sum, smallIntArrOfArraysA, smallIntArrOfArraysB);
+        }
+        sw.stop;
+        funcs[name0] ~= sw.peek.total!"nsecs";
+        Thread.sleep(sleepTime);
+    }
 
-    /// L2 norm of double Matrix.
-    auto m7 = Matrix!double(rows, cols, getRandomArray!double(1.0, rows * cols));
-    sw.reset;
-    sw.start;
-    auto f = squareL2Norm(m7);
-    sw.stop;
-    reportTime(sw, format("L2 norm of %sx%s double Matrix", rows, cols));
+    string name1 = format("Element-wise multiplication of two [%sx%s] arrays of arrays (double), (200 loops)",
+            rows / 20, cols / 30);
+    for (int i; i < nruns; ++i)
+    {
+        sw.reset;
+        sw.start;
+        for (int j; j < 200; ++j)
+        {
+            double[][] res = elementWiseOP!double(OPS.mul, smallArrOfArraysA, smallArrOfArraysB);
+        }
+        sw.stop;
+        funcs[name1] ~= sw.peek.total!"nsecs";
+        Thread.sleep(sleepTime);
+    }
 
-    /// Standard sort of double Matrix.
-    auto m8 = Matrix!double(rows, cols, getRandomArray!double(10.0, rows * cols));
-    sw.reset;
-    sw.start;
-    auto g = standardSort(m8).to2D;
-    sw.stop;
-    reportTime(sw, format("Standard sort of %sx%s double Matrix", rows, cols));
+    string name2 = format("Element-wise sum of two [%sx%s] struct matrices (int), (200 loops)",
+            rows / 20, cols / 30);
+    for (int i; i < nruns; ++i)
+    {
+        sw.reset;
+        sw.start;
+        for (int j; j < 200; ++j)
+        {
+            auto res = matrixElementWiseOp!int(OPS.sum, smallIntMatrixA, smallIntMatrixB).to2D;
+        }
+        sw.stop;
+        funcs[name2] ~= sw.peek.total!"nsecs";
+        Thread.sleep(sleepTime);
+    }
+
+    string name3 = format("Element-wise multiplication of two [%sx%s] struct matrices (double), (200 loops)",
+            rows / 20, cols / 30);
+    for (int i; i < nruns; ++i)
+    {
+        sw.reset;
+        sw.start;
+        for (int j; j < 200; ++j)
+        {
+            auto res = matrixElementWiseOp!double(OPS.mul, smallMatrixA, smallMatrixB).to2D;
+        }
+        sw.stop;
+        funcs[name3] ~= sw.peek.total!"nsecs";
+        Thread.sleep(sleepTime);
+    }
+
+    string name4 = format("Scalar product of two [%s] arrays (double)", rows * cols);
+    for (int i; i < nruns; ++i)
+    {
+        sw.reset;
+        sw.start;
+        auto res = dotProduct(arrayA, arrayB);
+        sw.stop;
+        funcs[name4] ~= sw.peek.total!"nsecs";
+        Thread.sleep(sleepTime);
+    }
+
+    /* 
+        We pick smaller because straight calculation of matrices >5kk elems becomes prohibitevely slow 
+        without using optimization techniques. 
+    */
+    string name5 = format("(Reference only) unoptimized dot product of two [%sx%s] struct matrices (double)",
+            dotRows, dotCols);
+    for (int i; i < nruns; ++i)
+    {
+        sw.reset;
+        sw.start;
+        Matrix!double initMatrix = Matrix!double(matrixA.rows, matrixB.cols);
+        auto res = matrixDotProduct!double(matrixA, matrixB, initMatrix);
+        sw.stop;
+        funcs[name5] ~= sw.peek.total!"nsecs";
+        Thread.sleep(sleepTime);
+    }
+
+    string name6 = format("L2 norm of [%sx%s] struct matrix (double)", rows, cols);
+    for (int i; i < nruns; ++i)
+    {
+        sw.reset;
+        sw.start;
+        auto res = squareL2Norm(matrixC);
+        sw.stop;
+        funcs[name6] ~= sw.peek.total!"nsecs";
+        Thread.sleep(sleepTime);
+    }
+
+    string name7 = format("(Reference only) destructive sort of [%sx%s] struct matrix (double)",
+            rows, cols);
+    for (int i; i < nruns; ++i)
+    {
+        sw.reset;
+        sw.start;
+        auto res = standardSort(matrixD).to2D;
+        sw.stop;
+        funcs[name7] ~= sw.peek.total!"nsecs";
+        Thread.sleep(sleepTime);
+    }
+
+    return funcs;
+}
+
+void runStandardBenchmarks()
+{
+    auto timings = functions(20);
+    foreach (pair; timings.byKeyValue)
+    {
+        // convert nsec. to sec. and compute the average
+        const double secs = pair.value.map!(a => a / pow(1000.0, 3)).sum / pair.value.length;
+        writeln(format("%s --> %s sec.", pair.key, secs));
+    }
 }
 
 unittest
 {
-
     int[][] arr1 = [[1, 2, 3], [4, 5, 6]];
     int[][] arr2 = [[1, 1, 1], [2, 2, 2]];
     int[][] res0 = [[2, 3, 4], [6, 7, 8]];

@@ -1,5 +1,6 @@
 module mir_ops_bench;
 
+import core.thread : Thread;
 import mir.blas : gemm;
 import mir.math.common : pow, sqrt;
 import mir.math.common : fastmath, optmath;
@@ -10,6 +11,7 @@ import mir.random : Random, threadLocalPtr;
 import mir.random.algorithm : randomSlice;
 import mir.random.variable : normalVar, uniformVar;
 import std.array : array;
+import std.datetime : dur, Duration;
 import std.datetime.stopwatch : AutoStart, StopWatch;
 import std.format : format;
 import std.stdio;
@@ -52,21 +54,9 @@ double scalarProduct(SliceArr sliceA1D, SliceArr sliceB1D)
     return accu.sqrt;
 }
 
-// __gshared double res;
-
-void reportTime(StopWatch sw, string msg)
-{
-    auto msecs = sw.peek.total!"msecs";
-    auto usecs = sw.peek.total!"usecs";
-    auto hnsecs = sw.peek.total!"hnsecs";
-    auto nsecs = sw.peek.total!"nsecs";
-    writeln(format(msg ~ ": %s sec. %s ms. %s μs. %s hs.", msecs / 1000.0,
-            usecs / 1000.0, hnsecs / 1000.0, nsecs / 1000.0));
-}
-
+/// Measure only op execution excluding the time for matrix/slice allocations.
 long[][string] functions(in int nruns = 10)
 {
-
     /*
     __gshared is a hack that makes value equivalent to a raw C global (module-level) variables.
     It is used here to trigger eager evaluation of the scalar product function which returns single double value.
@@ -75,8 +65,8 @@ long[][string] functions(in int nruns = 10)
     __gshared double gsharedRes1;
     __gshared double gsharedRes2;
 
-    long[][string] funcs;
     auto sw = StopWatch(AutoStart.no);
+    Duration sleepTime = dur!"msecs"(500);
     const rows = 5000;
     const cols = 6000;
     auto smallIntMatrixA = threadLocalPtr!Random.randomSlice(uniformVar!int(1,
@@ -99,6 +89,8 @@ long[][string] functions(in int nruns = 10)
     auto sliceA = threadLocalPtr!Random.randomSlice(uniformVar!double(0.0, 1.0), rows * cols);
     auto sliceB = threadLocalPtr!Random.randomSlice(uniformVar!double(0.0, 1.0), rows * cols);
 
+    long[][string] funcs;
+
     /// Element-wise sum of two int Slices.
     string name0 = format("Element-wise sum of two [%sx%s] slices (int), (200 loops)",
             rows / 20, cols / 30);
@@ -112,6 +104,7 @@ long[][string] functions(in int nruns = 10)
         }
         sw.stop;
         funcs[name0] ~= sw.peek.total!"nsecs"; // div by 1000^3 to get sec.
+        Thread.sleep(sleepTime);
     }
 
     /// Element-wise multiplication of two double Slices.
@@ -127,6 +120,7 @@ long[][string] functions(in int nruns = 10)
         }
         sw.stop;
         funcs[name1] ~= sw.peek.total!"nsecs";
+        Thread.sleep(sleepTime);
     }
 
     /// Scalar product of two double Slices.
@@ -138,6 +132,7 @@ long[][string] functions(in int nruns = 10)
         gsharedRes0 = scalarProduct(sliceA, sliceB);
         sw.stop;
         funcs[name2] ~= sw.peek.total!"nsecs";
+        Thread.sleep(sleepTime);
     }
 
     /// Scalar product of two double arrays (plain loop).
@@ -149,6 +144,7 @@ long[][string] functions(in int nruns = 10)
         gsharedRes1 = loopedScalarProduct(sliceA, sliceB);
         sw.stop;
         funcs[name3] ~= sw.peek.total!"nsecs";
+        Thread.sleep(sleepTime);
     }
 
     /// Dot product of two double 2D slices.
@@ -162,6 +158,7 @@ long[][string] functions(in int nruns = 10)
         gemm(1.0, matrixA, matrixC, 0, matrixD);
         sw.stop;
         funcs[name4] ~= sw.peek.total!"nsecs";
+        Thread.sleep(sleepTime);
     }
 
     /// L2 norm of double Slice.
@@ -173,6 +170,7 @@ long[][string] functions(in int nruns = 10)
         gsharedRes2 = squareL2Norm(matrixB);
         sw.stop;
         funcs[name5] ~= sw.peek.total!"nsecs";
+        Thread.sleep(sleepTime);
     }
 
     /// Sort of double Slice along axis=0.
@@ -187,6 +185,7 @@ long[][string] functions(in int nruns = 10)
             .each!sort;
         sw.stop;
         funcs[name6] ~= sw.peek.total!"nsecs";
+        Thread.sleep(sleepTime);
     }
 
     return funcs;
@@ -194,11 +193,11 @@ long[][string] functions(in int nruns = 10)
 
 void runMirBenchmarks()
 {
-    auto timings = functions;
+    auto timings = functions(20);
     foreach (pair; timings.byKeyValue)
     {
-        // convert nsec. to sec.
+        // convert nsec. to sec. and compute the average
         const double secs = pair.value.map!(a => a / pow(1000.0, 3)).sum / pair.value.length;
-        writeln(format("%s %s sec.", pair.key, secs));
+        writeln(format("%s --> %s sec.", pair.key, secs));
     }
 }
