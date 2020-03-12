@@ -8,7 +8,7 @@ Each benchmark was run 20 times with 0.5 sec. timeout, the timings were then col
 
 ### Benchmarks Yay!
 
-| Benchmark                                                                            | Numpy (BLAS) (sec.) | Standard D (sec.) | Mir D (sec.)        |
+| Description                                                                            | Numpy (BLAS) (sec.) | Standard D (sec.) | Mir D (sec.)        |
 | ------------------------------------------------------------------------------------ | ------------------- | ----------------- | ------------------- |
 | Element-wise sum of two 250x200 matrices (int), (200 loops)                          | 0.0105144           | 0.0207412 (x2)    | 0.00239246 (x1/4.4) |
 | Element-wise multiplication of two 250x200 matrices (float64/double), (200 loops)    | 0.0079411           | 0.0430237 (x5.4)  | 0.00257717 (x1/3.1) |
