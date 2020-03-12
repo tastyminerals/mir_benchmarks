@@ -10,7 +10,7 @@ def allocation_and_functions():
 
 
 def functions(nruns=1):
-    rows, cols = 5000, 6000
+    rows, cols = 500, 600
     reduceRowsBy, reduceColsBy = 5, 6
 
     small_int_matrixA = np.random.randint(
@@ -31,22 +31,22 @@ def functions(nruns=1):
     float_arrayB = np.random.rand(rows * cols)
 
     funcs = dd(list)
-    name = "Element-wise sum of two {}x{} matrices (int), (50 loops)".format(
+    name = "Element-wise sum of two {}x{} matrices (int), (1000 loops)".format(
         int(rows / reduceRowsBy), int(cols / reduceColsBy)
     )
     for _ in range(nruns):
         start = timer()
-        for _ in range(50):
+        for _ in range(1000):
             _ = small_int_matrixA + small_int_matrixB
         end = timer()
         funcs[name].append(end - start)
 
-    name = "Element-wise multiplication of two {}x{} matrices (float64), (50 loops)".format(
+    name = "Element-wise multiplication of two {}x{} matrices (float64), (1000 loops)".format(
         int(rows / reduceRowsBy), int(cols / reduceColsBy)
     )
     for _ in range(nruns):
         start = timer()
-        for _ in range(50):
+        for _ in range(1000):
             _ = small_float_matrixA * small_float_matrixB
         end = timer()
         funcs[name].append(end - start)
