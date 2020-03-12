@@ -8,18 +8,18 @@ Each benchmark was run 20 times with 0 sec. timeout, the timings were then colle
 
 ### Benchmarks Yay!
 
-| Description                                                                          | Numpy (BLAS) (sec.) | Standard D (sec.) | Mir D (sec.)         |
-| ------------------------------------------------------------------------------------ | ------------------- | ----------------- | -------------------- |
-| Element-wise sum of two 250x200 matrices (int), (50 loops)                           | 0.00115             | 0.00400213 (x3.5) | 0.00014372 (x1/8)    |
-| Element-wise multiplication of two 250x200 matrices (float64/double), (50 loops)     | 0.0011578           | 0.0132323 (x11.4) | 0.00013852 (x1/8.3)  |
-| Element-wise sum of two 500x600 matrices (int), (50 loops)                           | 0.0101275           | 0.016496 (x1.6)   | 0.00021556 (x1/47)   |
-| Element-wise multiplication of two 500x600 matrices (float64/double), (50 loops)     | 0.010182            | 0.06857 (x6.7)    | 0.00021717 (x1/47)   |
-| Element-wise sum of two 1k x 1k matrices (int), (50 loops)                           | 0.0493201           | 0.0614544 (x1.3)  | 0.000422135 (x1/117) |
-| Element-wise multiplication of two 1k x 1k matrices (float64/double), (50 loops)     | 0.0493693           | 0.233827 (x4.7)   | 0.000453535 (x1/109) |
-| Scalar product of two 30000000 arrays (float64/double)                               | 0.0152186           | 0.0227465 (x1.5)  | 0.0198812 (x1.3)     |
-| Dot product of 5000x6000 and 6000x5000 matrices (float64/double), (BLAS vs OpenBLAS) | 1.6084685           | ---               | 2.03398 (x1.2)       |
-| L2 norm of 5000x6000 matrix (float64/double)                                         | 0.0072423           | 0.0160546 (x2.2)  | 0.0110136 (x1.6)     |
-| Quicksort of 5000x6000 matrix (float64/double)                                       | 2.6516816           | 0.178071 (x14.8)  | 1.52406 (x1/0.6)     |
+| Description                                                                          | Numpy (BLAS) (sec.) | Standard D (sec.)  | Mir D (sec.)         |
+| ------------------------------------------------------------------------------------ | ------------------- | ------------------ | -------------------- |
+| Element-wise sum of two 250x200 matrices (int), (50 loops)                           | 0.00115             | 0.00400213 (x3.5)  | 0.00014372 (x1/8)    |
+| Element-wise multiplication of two 250x200 matrices (float64/double), (50 loops)     | 0.0011578           | 0.0132323 (x11.4)  | 0.00013852 (x1/8.3)  |
+| Element-wise sum of two 500x600 matrices (int), (50 loops)                           | 0.0101275           | 0.016496 (x1.6)    | 0.00021556 (x1/47)   |
+| Element-wise multiplication of two 500x600 matrices (float64/double), (50 loops)     | 0.010182            | 0.06857 (x6.7)     | 0.00021717 (x1/47)   |
+| Element-wise sum of two 1k x 1k matrices (int), (50 loops)                           | 0.0493201           | 0.0614544 (x1.3)   | 0.000422135 (x1/117) |
+| Element-wise multiplication of two 1k x 1k matrices (float64/double), (50 loops)     | 0.0493693           | 0.233827 (x4.7)    | 0.000453535 (x1/109) |
+| Scalar product of two 30000000 arrays (float64/double)                               | 0.0152186           | 0.0227465 (x1.5)   | 0.0198812 (x1.3)     |
+| Dot product of 5000x6000 and 6000x5000 matrices (float64/double), (BLAS vs OpenBLAS) | 1.6084685           | ---                | 2.03398 (x1.2)       |
+| L2 norm of 5000x6000 matrix (float64/double)                                         | 0.0072423           | 0.0160546 (x2.2)   | 0.0110136 (x1.6)     |
+| Quicksort of 5000x6000 matrix (float64/double)                                       | 2.6516816           | 0.178071 (x1/14.8) | 1.52406 (x1/0.6)     |
 
 ##### Numpy (BLAS)
 
