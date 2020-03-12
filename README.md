@@ -1,6 +1,18 @@
 # D Benchmarks against Numpy
 Each benchmark was run 20 times with 0 sec. timeout, the timings were then collected and averaged.
 
+### Compile and Run
+
+- D
+```
+dub run --compiler=ldc --build=release
+```
+
+- Numpy
+```
+python other_benchmarks/basic_ops_bench.py 
+```
+
 ### Hardware
 
  * CPU: Quad Core Intel Core i7-7700HQ (-MT MCP-) speed/min/max: 919/800/3800 MHz Kernel: 5.5.7-1-MANJARO x86_64 Up: 4h 36m 
