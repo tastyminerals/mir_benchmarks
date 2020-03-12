@@ -5,29 +5,18 @@
  * CPU: Quad Core Intel Core i7-7700HQ (-MT MCP-) speed/min/max: 919/800/3800 MHz Kernel: 5.5.7-1-MANJARO x86_64 Up: 4h 36m 
  * Mem: 2814.2/48147.6 MiB (5.8%) Storage: 489.05 GiB (6.6% used) Procs: 271 Shell: fish 3.1.0 inxi: 3.0.37 
 
-This repo contains various benchmarks for multidimensional D arrays:
-
-    - multidimensional array element-wise sum
-    - multidimensional array element-wise multiplication
-    - single array struct (Matrix) element-wise sum
-    - single array struct (Matrix) element-wise multiplication
-    - scalar product of two arrays
-    - dot product of two single array struct (Matrix)
-    - L2 norm of single array struct (Matrix)
-    - Standard sort of single array struct (Matrix)
-
-| benchmark                                                                            | Numpy (BLAS)              | Standard D            | Mir D                    |
-| ------------------------------------------------------------------------------------ | ------------------------- | --------------------- | ------------------------ |
-| Element-wise sum of two 250x200 matrices (int), (200 loops)                          | 0.01051435709987345 sec.  | 0.0207412 sec. (x2)   | 0.00239246 sec. (x1/4.4) |
-| Element-wise multiplication of two 250x200 matrices (float64/double), (200 loops)    | 0.007941059350105206 sec. | 0.0430237 sec. (x5.4) | 0.00257717 sec. (x1/3.1) |
-| Scalar product of two 30000000 arrays (float64/double)                               | 0.0179826627500006 sec.   | 0.0273022 sec. (x1.5) | 0.0239525  sec. (x1.3)   |
-| Dot product of 5000x6000 and 6000x5000 matrices (float64/double), (BLAS vs OpenBLAS) | 1.6588485575500271 sec.   | ---                   | 2.05365 sec. (x1.2)      |
-| L2 norm of 5000x6000 matrix (float64/double)                                         | 0.009825466249913007 sec. | 0.023526 sec. (x2.4)  | 0.0161355 sec. (x1.6)    |
-| Quicksort of 5000x6000 matrix (float64/double)                                       | 2.681328929350184 sec.    | ---                   | 1.52261 sec. (x1/0.6)    |
+| Benchmark                                                                            | Numpy (BLAS)   | Standard D            | Mir D                    |
+| ------------------------------------------------------------------------------------ | -------------- | --------------------- | ------------------------ |
+| Element-wise sum of two 250x200 matrices (int), (200 loops)                          | 0.0105144 sec. | 0.0207412 sec. (x2)   | 0.00239246 sec. (x1/4.4) |
+| Element-wise multiplication of two 250x200 matrices (float64/double), (200 loops)    | 0.0079411 sec. | 0.0430237 sec. (x5.4) | 0.00257717 sec. (x1/3.1) |
+| Scalar product of two 30000000 arrays (float64/double)                               | 0.0179827 sec. | 0.0273022 sec. (x1.5) | 0.0239525  sec. (x1.3)   |
+| Dot product of 5000x6000 and 6000x5000 matrices (float64/double), (BLAS vs OpenBLAS) | 1.6588486 sec. | ---                   | 2.05365 sec. (x1.2)      |
+| L2 norm of 5000x6000 matrix (float64/double)                                         | 0.0098255 sec. | 0.023526 sec. (x2.4)  | 0.0161355 sec. (x1.6)    |
+| Quicksort of 5000x6000 matrix (float64/double)                                       | 2.6813289 sec. | ---                   | 1.52261 sec. (x1/0.6)    |
 
 ### Numpy (BLAS)
 
-| benchmark                                                                  | time                      |
+| Benchmark                                                                  | Time                      |
 | -------------------------------------------------------------------------- | ------------------------- |
 | Element-wise sum of two 250x200 matrices (int), (200 loops)                | 0.01051435709987345 sec.  |
 | Element-wise multiplication of two 250x200 matrices (float64), (200 loops) | 0.007941059350105206 sec. |
@@ -39,7 +28,7 @@ This repo contains various benchmarks for multidimensional D arrays:
 
 ### Standard D
 
-| benchmark                                                                           | time           |
+| Benchmark                                                                           | Time           |
 | ----------------------------------------------------------------------------------- | -------------- |
 | Element-wise sum of two [250x200] arrays of arrays (int), (200 loops)               | 0.0747522 sec. |
 | Element-wise multiplication of two [250x200] arrays of arrays (double), (200 loops) | 0.0735269 sec. |
@@ -52,7 +41,8 @@ This repo contains various benchmarks for multidimensional D arrays:
 
 
 ### Mir D
-| benchmark                                                                 | time            |
+
+| Benchmark                                                                 | Time            |
 | ------------------------------------------------------------------------- | --------------- |
 | Element-wise sum of two [250x200] slices (int), (200 loops)               | 0.00239246 sec. |
 | Element-wise multiplication of two [250x200] slices (double), (200 loops) | 0.00257717 sec. |
