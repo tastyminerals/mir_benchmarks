@@ -6,6 +6,8 @@ Each benchmark was run 20 times with 0.5 sec. timeout, the timings were then col
  * CPU: Quad Core Intel Core i7-7700HQ (-MT MCP-) speed/min/max: 919/800/3800 MHz Kernel: 5.5.7-1-MANJARO x86_64 Up: 4h 36m 
  * Mem: 2814.2/48147.6 MiB (5.8%) Storage: 489.05 GiB (6.6% used) Procs: 271 Shell: fish 3.1.0 inxi: 3.0.37 
 
+### Benchmarks Yay!
+
 | Benchmark                                                                            | Numpy (BLAS) (sec.) | Standard D (sec.) | Mir D (sec.)        |
 | ------------------------------------------------------------------------------------ | ------------------- | ----------------- | ------------------- |
 | Element-wise sum of two 250x200 matrices (int), (200 loops)                          | 0.0105144           | 0.0207412 (x2)    | 0.00239246 (x1/4.4) |
