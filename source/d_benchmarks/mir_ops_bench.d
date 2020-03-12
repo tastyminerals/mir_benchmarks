@@ -7,16 +7,15 @@ import mir.math.sum;
 import mir.ndslice;
 import mir.ndslice.sorting : sort;
 import mir.random : Random, threadLocalPtr;
-import mir.random.algorithm : randomSlice;
+import mir.random.algorithm : randomSlice, shuffle;
 import mir.random.variable : normalVar, uniformVar;
-import std.array : array;
 import std.datetime.stopwatch : AutoStart, StopWatch;
 import std.format : format;
 import std.stdio;
 
-alias SliceArr = mir_slice!(double*, 1LU, cast(mir_slice_kind) 2);
-alias SliceMatrix = Slice!(double*, 2LU, cast(mir_slice_kind) 2);
-alias SliceMatrixArr = Slice!(double*, 2LU, cast(mir_slice_kind) 2)[];
+alias SliceArr = Slice!(double*);
+alias SliceMatrix = Slice!(double*, 2);
+alias SliceMatrixArr = Slice!(double*, 2)[];
 
 pragma(inline) static @optmath fmuladd(T, Z)(const T a, Z z)
 {
@@ -25,7 +24,8 @@ pragma(inline) static @optmath fmuladd(T, Z)(const T a, Z z)
 
 double scalarProduct(SliceArr sliceA1D, SliceArr sliceB1D)
 {
-    auto zipped = zip!true(sliceA1D, sliceB1D);
+    //zip is the same as zip!true for Contiguous kind of Slices
+    auto zipped = zip(sliceA1D, sliceB1D);
     return reduce!fmuladd(0.0, zipped);
 }
 
@@ -33,10 +33,15 @@ double scalarProduct(SliceArr sliceA1D, SliceArr sliceB1D)
 {
     pragma(inline, false);
     double accu = 0;
+    assert(s0.length == s1.length);
     foreach (size_t i; 0 .. s0.length)
     {
         // will result in vectorized fused-multiply-add instructions
-        accu += s0[i] * s1[i];
+        accu += s0._iterator[i] * s1._iterator[i];
+        // NOTE: No vectorized fused-multiply-add instructions
+        // for direct call s[i] for now.
+        // Will be fixed in the next mir-algorithm version.
+        // accu += s0[i] * s1[i]; 
     }
     return accu;
 }
@@ -46,10 +51,15 @@ double scalarProduct(SliceArr sliceA1D, SliceArr sliceB1D)
     pragma(inline, false);
     auto matrixA = m.flattened;
     double accu = 0;
-    foreach (size_t i; 0 .. matrixA.length)
-    {
-        accu += matrixA[i].pow(2);
-    }
+    // NOTE: that BLAS nrm2
+    // has more robust but slower algorithm
+
+    // NOTE: .field returns a common D array
+    // to workaround the same vectorisation bug as for loopedScalarProduct
+    // Note: ^^ 2 is faster then .pow(2)
+    // Note: e * e is better for optimiser then ^^ 2
+    foreach (e; m.field)
+        accu += e * e;
     return accu.sqrt;
 }
 
@@ -99,9 +109,15 @@ long[][string] functions(in int nruns = 10)
     {
         sw.reset;
         sw.start;
+        // The benefit of D/Mir over numpy is that you can
+        // reuse memory and use native operations in the same time.
+        // In numpy you can either use builtin C funcitons
+        // or reuse memory by runing slow python loops.
+        auto res = smallIntMatrixA.shape.slice!int;
         for (int j; j < 50; ++j)
         {
-            auto res = (smallIntMatrixA + smallIntMatrixB).array;
+            // zero memory allocation
+            res[] = smallIntMatrixA * smallIntMatrixB; // can be any element-wise math expression
         }
         sw.stop;
         funcs[name0] ~= sw.peek.total!"nsecs"; // div by 1000^3 to get sec.
@@ -114,9 +130,12 @@ long[][string] functions(in int nruns = 10)
     {
         sw.reset;
         sw.start;
+        // ditto, see comment for Element-wise sum of two int Slices.
+        auto res = smallMatrixA.shape.slice!double;
         for (int j; j < 50; ++j)
         {
-            auto res = (smallMatrixA * smallMatrixB).array;
+            // zero memory allocation
+            res[] = smallMatrixA * smallMatrixB; // can be any element-wise math expression
         }
         sw.stop;
         funcs[name1] ~= sw.peek.total!"nsecs";
@@ -147,11 +166,16 @@ long[][string] functions(in int nruns = 10)
     /// Dot product of two double 2D slices.
     string name4 = format("Dot product of two [%sx%s] and [%sx%s] slices (double)",
             rows, cols, cols, rows);
+    // The benefit of BLAS API is that it is more cache friendly,
+    // don't do allocations in the loop if possible.
+    auto matrixD = slice!double([rows, rows]);
     for (int i; i < nruns; ++i)
     {
-        auto matrixD = slice!double([rows, rows]);
         sw.reset;
         sw.start;
+        // mir-blas can be linked with Intel-MKL (including multithreaded version)
+        // please try it instead of OpenBLAS (check its subConfiguration options).
+        // Or, at least it compile OpenBLAS with for the native CPU.
         gemm(1.0, matrixA, matrixC, 0, matrixD);
         sw.stop;
         funcs[name4] ~= sw.peek.total!"nsecs";
@@ -170,10 +194,12 @@ long[][string] functions(in int nruns = 10)
 
     /// Sort of double Slice along axis=0.
     string name6 = format("Sort of [%sx%s] slice (double)", rows, cols);
+    // Don't do allocations in the loop if possible.
+    auto matrix = uniformVar!double(-1.0, 1.0).randomSlice([rows, cols]);
     for (int i; i < nruns; ++i)
     {
-        auto matrix = threadLocalPtr!Random.randomSlice(uniformVar!double(-1.0,
-                1.0), [rows, cols]);
+        // shufle the matrix
+        matrix.flattened.shuffle;
         sw.reset;
         sw.start;
         matrix.byDim!0
@@ -189,7 +215,8 @@ void runMirBenchmarks()
 {
     writeln("---[Mir D]---");
     auto timings = functions(20);
-    foreach (pair; timings.byKeyValue)
+    import mir.series; // for sorted output
+    foreach (pair; timings.series)
     {
         // convert nsec. to sec. and compute the average
         const double secs = pair.value.map!(a => a / pow(1000.0, 3)).sum / pair.value.length;
