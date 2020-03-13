@@ -1,7 +1,5 @@
-import time
+from time import perf_counter as timer
 from collections import defaultdict as dd
-from timeit import default_timer as timer
-
 import numpy as np
 
 
@@ -11,20 +9,20 @@ def allocation_and_functions():
 
 def functions(nruns=1):
     rows, cols = 500, 600
-    reduceRowsBy, reduceColsBy = 5, 6
+    reduceRows, reduceCols = rows / 5, cols / 6
 
     small_int_matrixA = np.random.randint(
-        1, 10, [int(rows / reduceRowsBy), int(cols / reduceColsBy)]
+        1, 10, [int(reduceRows), int(reduceCols)]
     )
     small_int_matrixB = np.random.randint(
-        1, 10, [int(rows / reduceRowsBy), int(cols / reduceColsBy)]
+        1, 10, [int(reduceRows), int(reduceCols)]
     )
     float_matrixA = np.random.rand(rows, cols)
     small_float_matrixA = np.random.rand(
-        int(rows / reduceRowsBy), int(cols / reduceColsBy)
+        int(reduceRows), int(reduceCols)
     )
     small_float_matrixB = np.random.rand(
-        int(rows / reduceRowsBy), int(cols / reduceColsBy)
+        int(reduceRows), int(reduceCols)
     )
     float_matrixC = np.random.rand(cols, rows)
     float_arrayA = np.random.rand(rows * cols)
@@ -32,7 +30,7 @@ def functions(nruns=1):
 
     funcs = dd(list)
     name = "Element-wise sum of two {}x{} matrices (int), (1000 loops)".format(
-        int(rows / reduceRowsBy), int(cols / reduceColsBy)
+        int(reduceRows), int(reduceCols)
     )
     for _ in range(nruns):
         start = timer()
@@ -42,7 +40,7 @@ def functions(nruns=1):
         funcs[name].append(end - start)
 
     name = "Element-wise multiplication of two {}x{} matrices (float64), (1000 loops)".format(
-        int(rows / reduceRowsBy), int(cols / reduceColsBy)
+        int(reduceRows), int(reduceCols)
     )
     for _ in range(nruns):
         start = timer()
@@ -51,10 +49,11 @@ def functions(nruns=1):
         end = timer()
         funcs[name].append(end - start)
 
-    name = "Scalar product of two {} arrays (float64)".format(rows * cols)
+    name = "Scalar product of two {} arrays (float64), (1000 loops)".format(rows * cols)
     for _ in range(nruns):
         start = timer()
-        _ = float_arrayA @ float_arrayB
+        for _ in range(1000):
+            _ = float_arrayA @ float_arrayB
         end = timer()
         funcs[name].append(end - start)
 
@@ -67,17 +66,19 @@ def functions(nruns=1):
         end = timer()
         funcs[name].append(end - start)
 
-    name = "L2 norm of {}x{} matrix (float64)".format(rows, cols)
+    name = "L2 norm of {}x{} matrix (float64), (1000 loops)".format(rows, cols)
     for _ in range(nruns):
         start = timer()
-        _ = np.linalg.norm(float_matrixA) ** 2
+        for _ in range(1000):
+            _ = np.linalg.norm(float_matrixA)
         end = timer()
         funcs[name].append(end - start)
 
     name = "Sort of {}x{} matrix (float64)".format(rows, cols)
     for _ in range(nruns):
+        np.random.shuffle(float_matrixA.reshape(rows * cols))
         start = timer()
-        _ = np.sort(float_matrixA, axis=None)
+        _ = np.sort(float_matrixA)
         end = timer()
         funcs[name].append(end - start)
 

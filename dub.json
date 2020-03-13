@@ -14,7 +14,7 @@
 		"mir-blas": "~>1.1.9"
 	},
     "dflags-ldc": ["-mcpu=native"],
-    "subConfigurations": {"mir-blas": "twolib", "comment": "Also try MKL like 'mkl-tbb-thread'"},
+    "subConfigurations": {"mir-blas": "library", "comment": "Also try MKL like 'mkl-tbb-thread'"},
 	"buildTypes": {
 		"release": {
 			"buildOptions": ["releaseMode", "inline", "optimize"],
