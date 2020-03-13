@@ -20,14 +20,14 @@ python other_benchmarks/basic_ops_bench.py
 
 ### Benchmarks Yay!
 
-| Description                                                                 | Numpy (BLAS) (sec.)   | Standard D (sec.)    | Mir D (sec.)         |
-| --------------------------------------------------------------------------- | --------------------- | -------------------- | -------------------- |
-| Element-wise sum of two 100x100 matrices (int), (1000 loops)                | 0.0037406866998935585 | 0.00391301 (x1.1)    | 0.00135104 (x1/2.8)  |
-| Element-wise multiplication of two 100x100 matrices (float64), (1000 loops) | 0.004177645951131126  | 0.0386691 (x9.3)     | 0.00310666 (x1/0.7)  |
-| Scalar product of two 300000 arrays (float64)                               | 0.0001648812492931029 | 0.00018331 (x1.1)    | 0.000112205 (x1/1.5) |
-| Dot product of 500x600 and 600x500 matrices (float64)                       | 0.0018967882002471014 | 0.171296 (x90.3)     | 0.00224537 (x1.2)    |
-| L2 norm of 500x600 matrix (float64)                                         | 3.248330031055957e-05 | 0.00013854 (x4.3)    | 6.749e-05 (x1/0.5)   |
-| Sort of 500x600 matrix (float64)                                            | 0.020701468300103443  | 0.00117536 (x1/17.6) | 0.00981535 (x1/2.1)  |
+| Description                                                                 | Numpy (BLAS) (sec.)   | Standard D (sec.)  | Mir D (sec.)         |
+| --------------------------------------------------------------------------- | --------------------- | ------------------ | -------------------- |
+| Element-wise sum of two 100x100 matrices (int), (1000 loops)                | 0.0037406866998935585 | 0.00391301 (x1.1)  | 0.00135104 (x1/2.8)  |
+| Element-wise multiplication of two 100x100 matrices (float64), (1000 loops) | 0.004177645951131126  | 0.0386691 (x9.3)   | 0.00310666 (x1/0.7)  |
+| Scalar product of two 300000 arrays (float64)                               | 0.0001648812492931029 | 0.00018331 (x1.1)  | 0.000112205 (x1/1.5) |
+| Dot product of 500x600 and 600x500 matrices (float64)                       | 0.0018967882002471014 | 0.171296 (x90.3)   | 0.00224537 (x1.2)    |
+| L2 norm of 500x600 matrix (float64)                                         | 3.248330031055957e-05 | 0.00013854 (x4.3)  | 6.749e-05 (x1/0.5)   |
+| Sort of 500x600 matrix (float64)                                            | 0.020701468300103443  | 0.0110866 (x1/1.9) | 0.00981535 (x1/2.1)  |
 
 ##### Numpy (BLAS)
 
@@ -51,7 +51,7 @@ python other_benchmarks/basic_ops_bench.py
 | Element-wise sum of two [100x100] struct matrices (int), (1000 loops)                | 0.00391301  |
 | L2 norm of [500x600] struct matrix (double)                                          | 0.00013854  |
 | Scalar product of two [300000] arrays (double)                                       | 0.00018331  |
-| Sort of [500x600] struct matrix (double)                                             | 0.001175361 |
+| Sort of [500x600] struct matrix (double)                                             | 0.0110866   |
 
 
 ##### Mir D

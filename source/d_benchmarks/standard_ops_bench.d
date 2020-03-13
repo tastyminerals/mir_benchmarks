@@ -27,7 +27,7 @@ import std.datetime.stopwatch : AutoStart, StopWatch;
 import std.format : format;
 import std.math : pow, sqrt;
 import std.numeric : dotProduct;
-import std.random : uniform, unpredictableSeed, Xorshift;
+import std.random : randomShuffle, uniform, unpredictableSeed, Xorshift;
 import std.range : chunks, generate, take, zip;
 import std.stdio;
 
@@ -308,6 +308,7 @@ long[][string] functions(in int nruns = 10)
     string name7 = format("Sort of [%sx%s] struct matrix (double)", rows, cols);
     for (int i; i < nruns; ++i)
     {
+        matrixD.to2D.each!randomShuffle; // reshuffle columns
         sw.reset;
         sw.start;
         auto res = columnWiseSort(matrixD);
