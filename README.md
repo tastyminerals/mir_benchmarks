@@ -1,7 +1,7 @@
-# D Benchmarks against Numpy
+# D Benchmarks against NumPy
 Each benchmark was run 20 times with 0 sec. timeout, the timings were then collected and averaged.
 
-Keep in mind that Numpy scalar, dot product operations are **multithreaded** while D benchmarks use **single-threaded** openBLAS version.
+Keep in mind that NumPy scalar, dot product operations are **multithreaded** while D benchmarks use **single-threaded** openBLAS version.
 
 ### Compile and Run
 
