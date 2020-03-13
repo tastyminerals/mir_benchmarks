@@ -67,10 +67,12 @@ python3 other_benchmarks/basic_ops_bench.py
 | Sort of [500x600] slice (double)                                           | 0.00951812  |
 
 ##### Unoptimized Dot Product
-Although our dot product implementation is pretty fast with small to medium sized matrices, it becomes prohibitively slow with big matrices.
-Efficient matrix multiplication is a field of its own.
-Numpy uses heavily optimized well-known BLAS [general matrix multiplication `gemm`](https://software.intel.com/en-us/mkl-developer-reference-fortran-gemm) routine.
-Using plain loops for dot operation works with smaller matrices as the table below shows.
+Standard D library does not have a function for dot product therefore we are using plain loop implementation.
+Although looped function is pretty fast with small to medium sized matrices, it becomes prohibitively slow with bigger matrices (efficient matrix multiplication is a field on its own).
+Numpy uses heavily optimized BLAS [general matrix multiplication `gemm`](https://software.intel.com/en-us/mkl-developer-reference-fortran-gemm) routine.
+Nothing really stops you from using the same via [D CBLAS package](https://code.dlang.org/packages/cblas) directly in your code.
+
+Unoptimized `matrixDotProduct` function timings:
 
 | Matrix Sizes      | Time (sec.) |
 | ----------------- | ----------: |
