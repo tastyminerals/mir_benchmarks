@@ -27,7 +27,7 @@ import std.datetime.stopwatch : AutoStart, StopWatch;
 import std.format : format;
 import std.math : pow, sqrt;
 import std.numeric : dotProduct;
-import std.random : uniform, unpredictableSeed, Xorshift;
+import std.random : uniform, unpredictableSeed, Xorshift, randomShuffle;
 import std.range : chunks, generate, take, zip;
 import std.stdio;
 
@@ -63,9 +63,14 @@ struct Matrix(T)
         this.cols = cols;
     }
 
-    @fastmath T[][] to2D()
+    T[][] to2D()
     {
-        return this.data.chunks(this.cols).array;
+        return to2DLazy.array;
+    }
+
+    auto to2DLazy()
+    {
+        return this.data.chunks(this.cols);
     }
 
     size_t length()
@@ -166,12 +171,12 @@ do
 
 @fastmath double squareL2Norm(T)(Matrix!T m)
 {
-    return m.data.map!(a => a.pow(2)).sum.sqrt;
+    return m.data.map!(a => a * a).sum.sqrt;
 }
 
 @fastmath Matrix!T columnWiseSort(T)(Matrix!T m)
 {
-    m.to2D.each!(row => sort!("a < b", SwapStrategy.unstable)(row));
+    m.to2DLazy.each!(row => sort!("a < b", SwapStrategy.unstable)(row));
     return m;
 }
 
@@ -181,27 +186,27 @@ long[][string] functions(in int nruns = 10)
     auto sw = StopWatch(AutoStart.no);
     const rows = 500;
     const cols = 600;
-    const reduceRowsBy = 5;
-    const reduceColsBy = 6;
+    const reduceRows = rows / 5;
+    const reduceCols = cols / 6;
 
     const dotRows = rows;
     const dotCols = cols;
 
-    int[][] smallIntArrOfArraysA = getRandomAArray!int(10, rows / reduceRowsBy, cols / reduceColsBy);
-    int[][] smallIntArrOfArraysB = getRandomAArray!int(10, rows / reduceRowsBy, cols / reduceColsBy);
+    int[][] smallIntArrOfArraysA = getRandomAArray!int(10, reduceRows, reduceCols);
+    int[][] smallIntArrOfArraysB = getRandomAArray!int(10, reduceRows, reduceCols);
     double[][] smallArrOfArraysA = getRandomAArray!double(1.0,
-            rows / reduceRowsBy, cols / reduceColsBy);
+            reduceRows, reduceCols);
     double[][] smallArrOfArraysB = getRandomAArray!double(1.0,
-            rows / reduceRowsBy, cols / reduceColsBy);
-    auto smallIntMatrixA = Matrix!int(rows / reduceRowsBy, cols / reduceColsBy,
-            getRandomArray!int(10, (rows / reduceRowsBy) * (cols / reduceColsBy)));
-    auto smallIntMatrixB = Matrix!int(rows / reduceRowsBy, cols / reduceColsBy,
-            getRandomArray!int(10, (rows / reduceRowsBy) * (cols / reduceColsBy)));
-    auto smallMatrixA = Matrix!double(rows / reduceRowsBy, cols / reduceColsBy,
-            getRandomArray!double(1.0, (rows / reduceRowsBy) * (cols / reduceColsBy)));
+            reduceRows, reduceCols);
+    auto smallIntMatrixA = Matrix!int(reduceRows, reduceCols,
+            getRandomArray!int(10, reduceRows * reduceCols));
+    auto smallIntMatrixB = Matrix!int(reduceRows, reduceCols,
+            getRandomArray!int(10, reduceRows * reduceCols));
+    auto smallMatrixA = Matrix!double(reduceRows, reduceCols,
+            getRandomArray!double(1.0, reduceRows * reduceCols));
 
-    auto smallMatrixB = Matrix!double(rows / reduceRowsBy, cols / reduceColsBy,
-            getRandomArray!double(1.0, (rows / reduceRowsBy) * (cols / reduceColsBy)));
+    auto smallMatrixB = Matrix!double(reduceRows, reduceCols,
+            getRandomArray!double(1.0, reduceRows * reduceCols));
 
     auto arrayA = getRandomArray!double(1.0, rows * cols);
     auto arrayB = getRandomArray!double(1.0, rows * cols);
@@ -214,7 +219,7 @@ long[][string] functions(in int nruns = 10)
 
     long[][string] funcs;
     string name0 = format("Element-wise sum of two [%sx%s] arrays of arrays (int), (1000 loops)",
-            rows / reduceRowsBy, cols / reduceColsBy);
+            reduceRows, reduceCols);
     for (int i; i < nruns; ++i)
     {
         sw.reset;
@@ -228,7 +233,7 @@ long[][string] functions(in int nruns = 10)
     }
 
     string name1 = format("Element-wise multiplication of two [%sx%s] arrays of arrays (double), (1000 loops)",
-            rows / reduceRowsBy, cols / reduceColsBy);
+            reduceRows, reduceCols);
     for (int i; i < nruns; ++i)
     {
         sw.reset;
@@ -242,7 +247,7 @@ long[][string] functions(in int nruns = 10)
     }
 
     string name2 = format("Element-wise sum of two [%sx%s] struct matrices (int), (1000 loops)",
-            rows / reduceRowsBy, cols / reduceColsBy);
+            reduceRows, reduceCols);
     for (int i; i < nruns; ++i)
     {
         sw.reset;
@@ -256,7 +261,7 @@ long[][string] functions(in int nruns = 10)
     }
 
     string name3 = format("Element-wise multiplication of two [%sx%s] struct matrices (double), (1000 loops)",
-            rows / reduceRowsBy, cols / reduceColsBy);
+            reduceRows, reduceCols);
     for (int i; i < nruns; ++i)
     {
         sw.reset;
@@ -269,12 +274,13 @@ long[][string] functions(in int nruns = 10)
         funcs[name3] ~= sw.peek.total!"nsecs";
     }
 
-    string name4 = format("Scalar product of two [%s] arrays (double)", rows * cols);
+    string name4 = format("Scalar product of two [%s] arrays (double), (1000 loops)", rows * cols);
     for (int i; i < nruns; ++i)
     {
         sw.reset;
         sw.start;
-        auto res = dotProduct(arrayA, arrayB);
+        for (int j; j < 1000; ++j)
+            auto res = dotProduct(arrayA, arrayB);
         sw.stop;
         funcs[name4] ~= sw.peek.total!"nsecs";
     }
@@ -295,12 +301,13 @@ long[][string] functions(in int nruns = 10)
         funcs[name5] ~= sw.peek.total!"nsecs";
     }
 
-    string name6 = format("L2 norm of [%sx%s] struct matrix (double)", rows, cols);
+    string name6 = format("L2 norm of [%sx%s] struct matrix (double), (1000 loops)", rows, cols);
     for (int i; i < nruns; ++i)
     {
         sw.reset;
         sw.start;
-        auto res = squareL2Norm(matrixC);
+        for (int j; j < 1000; ++j)
+            auto res = squareL2Norm(matrixC);
         sw.stop;
         funcs[name6] ~= sw.peek.total!"nsecs";
     }
@@ -308,6 +315,7 @@ long[][string] functions(in int nruns = 10)
     string name7 = format("Sort of [%sx%s] struct matrix (double)", rows, cols);
     for (int i; i < nruns; ++i)
     {
+        matrixD.data.randomShuffle;
         sw.reset;
         sw.start;
         auto res = columnWiseSort(matrixD);
@@ -318,10 +326,11 @@ long[][string] functions(in int nruns = 10)
     return funcs;
 }
 
-void runStandardBenchmarks()
+void runStandardBenchmarks(int nruns)
 {
+    pragma(inline, false);
     writeln("---[Standard D]---");
-    auto timings = functions(20);
+    auto timings = functions(nruns);
     import mir.series; // for sorted output
     foreach (pair; timings.series)
     {

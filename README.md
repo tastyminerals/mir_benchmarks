@@ -5,12 +5,12 @@ Each benchmark was run 20 times with 0 sec. timeout, the timings were then colle
 
 - D
 ```
-dub run --compiler=ldc --build=release
+dub run --compiler=ldc2 --build=release --force
 ```
 
 - Numpy
 ```
-python other_benchmarks/basic_ops_bench.py 
+python3 other_benchmarks/basic_ops_bench.py 
 ```
 
 ### Hardware
