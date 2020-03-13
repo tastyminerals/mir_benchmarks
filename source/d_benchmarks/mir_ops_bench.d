@@ -16,7 +16,6 @@ alias SliceArr = Slice!(double*);
 alias SliceMatrix = Slice!(double*, 2);
 alias SliceMatrixArr = Slice!(double*, 2)[];
 
-
 @fastmath double scalarProduct(SliceArr sliceA1D, SliceArr sliceB1D)
 {
     pragma(inline, false);
@@ -71,10 +70,10 @@ long[][string] functions(in int nruns = 10)
     const reduceRows = rows / 5;
     const reduceCols = cols / 6;
 
-    auto smallIntMatrixA = uniformVar!int(1,10).randomSlice(reduceRows, reduceCols);
-    auto smallIntMatrixB = uniformVar!int(1,10).randomSlice(reduceRows, reduceCols);
-    auto smallMatrixA = uniformVar!double(0.0,1.0).randomSlice(reduceRows, reduceCols);
-    auto smallMatrixB = uniformVar!double(0.0,1.0).randomSlice(reduceRows, reduceCols);
+    auto smallIntMatrixA = uniformVar!int(1, 10).randomSlice(reduceRows, reduceCols);
+    auto smallIntMatrixB = uniformVar!int(1, 10).randomSlice(reduceRows, reduceCols);
+    auto smallMatrixA = uniformVar!double(0.0, 1.0).randomSlice(reduceRows, reduceCols);
+    auto smallMatrixB = uniformVar!double(0.0, 1.0).randomSlice(reduceRows, reduceCols);
     auto matrixA = uniformVar!double(0.0, 1.0).randomSlice(rows, cols);
     auto matrixB = uniformVar!double(0.0, 1.0).randomSlice(rows, cols);
     auto matrixC = uniformVar!double(0.0, 1.0).randomSlice(cols, rows);
@@ -141,7 +140,8 @@ long[][string] functions(in int nruns = 10)
     }
 
     /// Scalar product of two double arrays (plain loop).
-    string name3 = format("Scalar product of two [%s] slices (double), (plain loop), (1000 loops)", rows * cols);
+    string name3 = format("Scalar product of two [%s] slices (double), (plain loop), (1000 loops)",
+            rows * cols);
     auto measurements3 = new long[nruns];
     funcs[name3] = measurements3;
     foreach (i; 0 .. nruns)
@@ -155,7 +155,8 @@ long[][string] functions(in int nruns = 10)
     }
 
     /// Scalar product of two double arrays (BLAS).
-    string nameDotBLAS = format("Scalar product of two [%s] slices (double), (BLAS), (1000 loops)", rows * cols);
+    string nameDotBLAS = format(
+            "Scalar product of two [%s] slices (double), (BLAS), (1000 loops)", rows * cols);
     auto measurementsDotBLAS = new long[nruns];
     funcs[nameDotBLAS] = measurementsDotBLAS;
     foreach (i; 0 .. nruns)
@@ -214,7 +215,8 @@ long[][string] functions(in int nruns = 10)
         matrix.flattened.shuffle;
         sw.reset;
         sw.start;
-        matrix.byDim!0.each!sort;
+        matrix.byDim!0
+            .each!sort;
         sw.stop;
         measurements6[i] = sw.peek.total!"nsecs";
     }
@@ -232,6 +234,6 @@ void runMirBenchmarks(int nruns)
     {
         // convert nsec. to sec. and compute the average
         const double secs = pair.value.sum * 10.0.pow(-9) / pair.value.length;
-        writeln(format("| %s | %s", pair.key, secs));
+        writeln(format("| %s | %s |", pair.key, secs));
     }
 }
