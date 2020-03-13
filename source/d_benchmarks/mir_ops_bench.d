@@ -1,6 +1,6 @@
 module mir_ops_bench;
 
-import mir.blas : gemm, dot;
+import mir.blas : dot, gemm;
 import mir.math.common : fastmath, optmath;
 import mir.math.common : pow, sqrt;
 import mir.math.sum;

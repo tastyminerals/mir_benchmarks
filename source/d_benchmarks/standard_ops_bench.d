@@ -194,10 +194,8 @@ long[][string] functions(in int nruns = 10)
 
     int[][] smallIntArrOfArraysA = getRandomAArray!int(10, reduceRows, reduceCols);
     int[][] smallIntArrOfArraysB = getRandomAArray!int(10, reduceRows, reduceCols);
-    double[][] smallArrOfArraysA = getRandomAArray!double(1.0,
-            reduceRows, reduceCols);
-    double[][] smallArrOfArraysB = getRandomAArray!double(1.0,
-            reduceRows, reduceCols);
+    double[][] smallArrOfArraysA = getRandomAArray!double(1.0, reduceRows, reduceCols);
+    double[][] smallArrOfArraysB = getRandomAArray!double(1.0, reduceRows, reduceCols);
     auto smallIntMatrixA = Matrix!int(reduceRows, reduceCols,
             getRandomArray!int(10, reduceRows * reduceCols));
     auto smallIntMatrixB = Matrix!int(reduceRows, reduceCols,
