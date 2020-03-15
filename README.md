@@ -125,7 +125,7 @@ Set environment variables.
 | Element-wise multiplication of two [100x100] slices (double), (1000 loops)       | 0.00301221  |
 | Element-wise sum of two [100x100] slices (int), (1000 loops)                     | 0.00133979  |
 | L2 norm of [500x600] slice (double), (1000 loops)                                | 0.0390259   |
-| Matrix product of two [500x600] and [600x500] slices (double)                    | 0.00591477  |
+| Matrix product of two [500x600] and [600x500] slices (double), (OpenBLAS)                   | 0.00591477  |
 | Sort of [500x600] slice (double)                                                 | 0.011357    |
 
 ### NumPy (MKL) (multi-thread)
