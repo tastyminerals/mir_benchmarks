@@ -64,7 +64,7 @@ python3 other_benchmarks/basic_ops_bench.py
 | Element-wise sum of two [100x100] slices (int), (1000 loops)               | 0.00133468  |
 | L2 norm of [500x600] slice (double), (1000 loops)                          | 0.0394499   |
 | Scalar product of two [300000] slices (double), (1000 loops)               | 0.0911593   |
-| Scalar product of two [300000] slices (double), (openBLAS), (1000 loops)       | 0.0297874   |
+| Scalar product of two [300000] slices (double), (openBLAS), (1000 loops)   | 0.0297874   |
 | Scalar product of two [300000] slices (double), (plain loop), (1000 loops) | 0.0902336   |
 | Sort of [500x600] slice (double)                                           | 0.00951812  |
 

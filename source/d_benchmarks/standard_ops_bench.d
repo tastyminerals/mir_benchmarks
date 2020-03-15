@@ -10,7 +10,6 @@ This file contains several benchmarks for multidimensional D arrays:
     - L2 norm of single array struct (Matrix)
     - Standard sort of single array struct (Matrix)
 
-The implementation is naive, so no D black magic optimization here.
 There are two multidimensional array representations: array of arrays and a struct using a single array.
 First two benchmarks show how slow array of arrays are in comparison to single array struct.
 The remaining benchmarks use single array struct for multidimensional array representation.

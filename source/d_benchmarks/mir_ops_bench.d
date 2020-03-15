@@ -1,6 +1,18 @@
 module mir_ops_bench;
+/*
+This file contains several benchmarks for multidimensional Mir D slices:
 
-import mir.blas : dot, gemm;
+    - multidimensional slice element-wise sum
+    - multidimensional slice element-wise multiplication
+    - dot product of slices
+    - L2 norm of slices
+    - Slice sort
+
+RUN: dub run --compiler=ldc2 --build=release
+TEST: dub run --compiler=ldc2 --build=tests
+*/
+
+import mir.blas : dot, gemm, nrm2;
 import mir.math.common : fastmath, optmath;
 import mir.math.common : pow, sqrt;
 import mir.math.sum;
