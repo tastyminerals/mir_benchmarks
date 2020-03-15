@@ -109,7 +109,7 @@ export OMP_NUM_THREADS = 1
 | L2 norm of [500x600] struct matrix (double), (1000 loops)                             | 0.117289    |
 | Sort of [500x600] struct matrix (double)                                              | 0.0110437   |
 
-##### Mir D (single-thread)
+### Mir D (single-thread)
 
 Set environment variables.
     
