@@ -31,13 +31,14 @@ python3 other_benchmarks/basic_ops_bench.py
 
 ### Benchmarks (multi-thread)
 
-Below are only the changes that make a difference. 
-
-| Description                                                       | NumPy (MKL) (sec.)        | Mir D (sec.)           |
-| ----------------------------------------------------------------- | ------------------------- | ---------------------- |
-| Dot (scalar) product of two 300000 arrays (float64), (1000 loops) | 0.03528142820068751       | **0.0309097** (x1/1.1) |
-| L2 norm of 500x600 matrix (float64), (1000 loops)                 | **0.023907507749936486**  | 0.0398216 (x1.7)       |
-| Matrix product of 500x600 and 600x500 matrices (float64)          | **0.0018566828504845035** | 0.00206505 (x1.1)      |
+| Description                                                                 | NumPy (MKL) (sec.)        | Mir D (sec.)            |
+| --------------------------------------------------------------------------- | ------------------------- | ----------------------- |
+| Dot (scalar) product of two 300000 arrays (float64), (1000 loops)           | 0.03528142820068751       | **0.0309097** (x1/1.1)  |
+| Element-wise sum of two 100x100 matrices (int), (1000 loops)                | 0.0037877704002312385     | **0.0015176** (x1/2.5)  |
+| Element-wise multiplication of two 100x100 matrices (float64), (1000 loops) | 0.004193491550176986      | **0.00293436** (x1/1.4) |
+| L2 norm of 500x600 matrix (float64), (1000 loops)                           | **0.023907507749936486**  | 0.0398216 (x1.7)        |
+| Matrix product of 500x600 and 600x500 matrices (float64)                    | **0.0018566828504845035** | 0.00206505 (x1.1)       |
+| Sort of 500x600 matrix (float64)                                            | **0.010326230399914493**  | 0.0112988 (x1.1)        |
 
 ##### NumPy (MKL) (single-thread)
 
@@ -171,7 +172,7 @@ Set environment variables:
 | Dot (scalar) product of two [300000] slices (double), (OpenBLAS), (1000 loops)   | 0.0309097   |
 | Dot (scalar) product of two [300000] slices (double), (plain loop), (1000 loops) | 0.0860322   |
 | Element-wise multiplication of two [100x100] slices (double), (1000 loops)       | 0.00293436  |
-| Element-wise sum of two [100x100] slices (int), (1000 loops)                     | 0.00181411  |
+| Element-wise sum of two [100x100] slices (int), (1000 loops)                     | 0.0015176   |
 | L2 norm of [500x600] slice (double), (1000 loops)                                | 0.0398216   |
 | Matrix product of two [500x600] and [600x500] slices (double) (OpenBLAS)         | 0.00206505  |
 | Sort of [500x600] slice (double)                                                 | 0.0112988   |
