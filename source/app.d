@@ -8,7 +8,7 @@ void main(string[] args)
     int nruns = 20;
     string benchmarksId;
 
-    auto opts = getopt(args, "n|nruns", "number of runs whose time will be averaged (default 20)", &nruns, "b|bench",
+    auto opts = getopt(args, "n|nruns", "number of runs, the time will be averaged (default 20)", &nruns, "b|bench",
             "benchmark name to run [standard, mir], runs all if not set", &benchmarksId);
     if (opts.helpWanted)
     {

@@ -6,7 +6,8 @@ This file contains several benchmarks for multidimensional D arrays:
     - multidimensional array element-wise multiplication
     - single array struct (Matrix) element-wise sum
     - single array struct (Matrix) element-wise multiplication
-    - dot product of two single array struct (Matrix)
+    - Dot (scalar) product of two arrays
+    - Matrix product of two single array struct (Matrix)
     - L2 norm of single array struct (Matrix)
     - Standard sort of single array struct (Matrix)
 
@@ -188,9 +189,6 @@ long[][string] functions(in int nruns = 10)
     const reduceRows = rows / 5;
     const reduceCols = cols / 6;
 
-    const dotRows = rows;
-    const dotCols = cols;
-
     int[][] smallIntArrOfArraysA = getRandomAArray!int(10, reduceRows, reduceCols);
     int[][] smallIntArrOfArraysB = getRandomAArray!int(10, reduceRows, reduceCols);
     double[][] smallArrOfArraysA = getRandomAArray!double(1.0, reduceRows, reduceCols);
@@ -208,8 +206,8 @@ long[][string] functions(in int nruns = 10)
     auto arrayA = getRandomArray!double(1.0, rows * cols);
     auto arrayB = getRandomArray!double(1.0, rows * cols);
 
-    auto matrixA = Matrix!double(dotRows, dotCols, getRandomArray!double(1.0, dotRows * dotCols));
-    auto matrixB = Matrix!double(dotCols, dotRows, getRandomArray!double(1.0, dotRows * dotCols));
+    auto matrixA = Matrix!double(rows, cols, getRandomArray!double(1.0, rows * cols));
+    auto matrixB = Matrix!double(cols, rows, getRandomArray!double(1.0, rows * cols));
 
     auto matrixC = Matrix!double(rows, cols, getRandomArray!double(1.0, rows * cols));
     auto matrixD = Matrix!double(rows, cols, getRandomArray!double(1.0, rows * cols));
@@ -271,7 +269,8 @@ long[][string] functions(in int nruns = 10)
         funcs[name3] ~= sw.peek.total!"nsecs";
     }
 
-    string name4 = format("Scalar product of two [%s] arrays (double), (1000 loops)", rows * cols);
+    string name4 = format("Dot (scalar) product of two [%s] arrays (double), (1000 loops)",
+            rows * cols);
     for (int i; i < nruns; ++i)
     {
         sw.reset;
@@ -286,8 +285,8 @@ long[][string] functions(in int nruns = 10)
         We pick smaller because straight calculation of matrices >5kk elems becomes prohibitevely slow 
         without using optimization techniques. 
     */
-    string name5 = format("(Reference only) unoptimized dot product of two [%sx%s] struct matrices (double)",
-            dotRows, dotCols);
+    string name5 = format("(Reference only) unoptimized matrix product of two [%sx%s] struct matrices (double)",
+            rows, cols);
     for (int i; i < nruns; ++i)
     {
         sw.reset;

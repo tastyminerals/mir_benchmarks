@@ -4,15 +4,16 @@ This file contains several benchmarks for multidimensional Mir D slices:
 
     - multidimensional slice element-wise sum
     - multidimensional slice element-wise multiplication
-    - dot product of slices
+    - Dot (scalar) product of slices
+    - Matrix product of multidimensional slices
     - L2 norm of slices
-    - Slice sort
+    - Multidimensional slice sort
 
 RUN: dub run --compiler=ldc2 --build=release
 TEST: dub run --compiler=ldc2 --build=tests
 */
 
-import mir.blas : dot, gemm, nrm2;
+import mir.blas : dot, gemm;
 import mir.math.common : fastmath, optmath;
 import mir.math.common : pow, sqrt;
 import mir.math.sum;
@@ -166,9 +167,9 @@ long[][string] functions(in int nruns = 10)
         measurements3[i] = sw.peek.total!"nsecs";
     }
 
-    /// Scalar product of two double arrays (BLAS).
+    /// Dot (scalar) product of two double arrays (BLAS).
     string nameDotBLAS = format(
-            "Scalar product of two [%s] slices (double), (BLAS), (1000 loops)", rows * cols);
+            "Dot (scalar) product of two [%s] slices (double), (BLAS), (1000 loops)", rows * cols);
     auto measurementsDotBLAS = new long[nruns];
     funcs[nameDotBLAS] = measurementsDotBLAS;
     foreach (i; 0 .. nruns)
@@ -181,8 +182,8 @@ long[][string] functions(in int nruns = 10)
         measurementsDotBLAS[i] = sw.peek.total!"nsecs";
     }
 
-    /// Dot product of two double 2D slices.
-    string name4 = format("Dot product of two [%sx%s] and [%sx%s] slices (double)",
+    /// Matrix product of two double 2D slices.
+    string name4 = format("Matrix product of two [%sx%s] and [%sx%s] slices (double)",
             rows, cols, cols, rows);
     auto measurements4 = new long[nruns];
     funcs[name4] = measurements4;

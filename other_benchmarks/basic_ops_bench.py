@@ -1,5 +1,7 @@
-from time import perf_counter as timer
+import argparse
 from collections import defaultdict as dd
+from time import perf_counter as timer
+
 import numpy as np
 
 
@@ -11,19 +13,11 @@ def functions(nruns=1):
     rows, cols = 500, 600
     reduceRows, reduceCols = rows / 5, cols / 6
 
-    small_int_matrixA = np.random.randint(
-        1, 10, [int(reduceRows), int(reduceCols)]
-    )
-    small_int_matrixB = np.random.randint(
-        1, 10, [int(reduceRows), int(reduceCols)]
-    )
+    small_int_matrixA = np.random.randint(1, 10, [int(reduceRows), int(reduceCols)])
+    small_int_matrixB = np.random.randint(1, 10, [int(reduceRows), int(reduceCols)])
     float_matrixA = np.random.rand(rows, cols)
-    small_float_matrixA = np.random.rand(
-        int(reduceRows), int(reduceCols)
-    )
-    small_float_matrixB = np.random.rand(
-        int(reduceRows), int(reduceCols)
-    )
+    small_float_matrixA = np.random.rand(int(reduceRows), int(reduceCols))
+    small_float_matrixB = np.random.rand(int(reduceRows), int(reduceCols))
     float_matrixC = np.random.rand(cols, rows)
     float_arrayA = np.random.rand(rows * cols)
     float_arrayB = np.random.rand(rows * cols)
@@ -49,7 +43,7 @@ def functions(nruns=1):
         end = timer()
         funcs[name].append(end - start)
 
-    name = "Scalar product of two {} arrays (float64), (1000 loops)".format(rows * cols)
+    name = "Dot product of two {} arrays (float64), (1000 loops)".format(rows * cols)
     for _ in range(nruns):
         start = timer()
         for _ in range(1000):
@@ -57,7 +51,7 @@ def functions(nruns=1):
         end = timer()
         funcs[name].append(end - start)
 
-    name = "Dot product of {}x{} and {}x{} matrices (float64)".format(
+    name = "Matrix product of {}x{} and {}x{} matrices (float64)".format(
         rows, cols, cols, rows
     )
     for _ in range(nruns):
@@ -87,10 +81,22 @@ def functions(nruns=1):
 
 def benchmark():
     # TODO allocation_and_functions()
-    results = functions(20)
+    results = functions(args.nruns)
     for name, runs in results.items():
         print("| {} | {} |".format(name, sum(runs) / len(runs)))
 
 
 if __name__ == "__main__":
+    intro = "Run NumPy Python benchmarks."
+    formatter = argparse.ArgumentDefaultsHelpFormatter
+    prs = argparse.ArgumentParser(formatter_class=formatter, description=intro)
+    prs.add_argument(
+        "-n",
+        "--nruns",
+        required=False,
+        type=int,
+        default=20,
+        help="number of runs, the  time will be averaged",
+    )
+    args = prs.parse_args()
     benchmark()
