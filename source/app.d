@@ -1,7 +1,6 @@
 import mir_ops_bench;
 import standard_ops_bench;
 import std.getopt;
-import std.stdio;
 
 void main(string[] args)
 {
@@ -29,6 +28,7 @@ void main(string[] args)
         runMirBenchmarks(nruns);
         break;
     }
+
 }
 
 static string msg = q"EOD

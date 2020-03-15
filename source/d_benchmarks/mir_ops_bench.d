@@ -138,8 +138,9 @@ long[][string] functions(in int nruns = 10)
         measurements1[i] = sw.peek.total!"nsecs";
     }
 
-    /// Scalar product of two double Slices.
-    string name2 = format("Scalar product of two [%s] slices (double), (1000 loops)", rows * cols);
+    /// Dot (scalar) product of two double Slices.
+    string name2 = format("Dot (scalar) product of two [%s] slices (double), (1000 loops)",
+            rows * cols);
     auto measurements2 = new long[nruns];
     funcs[name2] = measurements2;
     foreach (i; 0 .. nruns)
@@ -152,8 +153,8 @@ long[][string] functions(in int nruns = 10)
         measurements2[i] = sw.peek.total!"nsecs";
     }
 
-    /// Scalar product of two double arrays (plain loop).
-    string name3 = format("Scalar product of two [%s] slices (double), (plain loop), (1000 loops)",
+    /// Dot (scalar) product of two double arrays (plain loop).
+    string name3 = format("Dot (scalar) product of two [%s] slices (double), (plain loop), (1000 loops)",
             rows * cols);
     auto measurements3 = new long[nruns];
     funcs[name3] = measurements3;
@@ -167,9 +168,10 @@ long[][string] functions(in int nruns = 10)
         measurements3[i] = sw.peek.total!"nsecs";
     }
 
-    /// Dot (scalar) product of two double arrays (BLAS).
+    /// Dot (scalar) product of two double arrays (OpenBLAS).
     string nameDotBLAS = format(
-            "Dot (scalar) product of two [%s] slices (double), (BLAS), (1000 loops)", rows * cols);
+            "Dot (scalar) product of two [%s] slices (double), (OpenBLAS), (1000 loops)",
+            rows * cols);
     auto measurementsDotBLAS = new long[nruns];
     funcs[nameDotBLAS] = measurementsDotBLAS;
     foreach (i; 0 .. nruns)
@@ -182,8 +184,8 @@ long[][string] functions(in int nruns = 10)
         measurementsDotBLAS[i] = sw.peek.total!"nsecs";
     }
 
-    /// Matrix product of two double 2D slices.
-    string name4 = format("Matrix product of two [%sx%s] and [%sx%s] slices (double)",
+    /// Matrix product of two double 2D slices (OpenBLAS).
+    string name4 = format("Matrix product of two [%sx%s] and [%sx%s] slices (double), (OpenBLAS)",
             rows, cols, cols, rows);
     auto measurements4 = new long[nruns];
     funcs[name4] = measurements4;
