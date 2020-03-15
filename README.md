@@ -40,7 +40,7 @@ python3 other_benchmarks/basic_ops_bench.py
 | Matrix product of 500x600 and 600x500 matrices (float64)                    | **0.0018566828504845035** | 0.00206505 (x1.1)       |
 | Sort of 500x600 matrix (float64)                                            | **0.010326230399914493**  | 0.0112988 (x1.1)        |
 
-##### NumPy (MKL) (single-thread)
+### NumPy (MKL) (single-thread)
 
 In order to limit the number of threads, set the environment variable prior to running the benchmarks.
 For example, anaconda NumPy uses **intel-mkl**, therefore the number of threads is controlled with `MKL_NUM_THREADS` variable. 
@@ -96,7 +96,7 @@ export OMP_NUM_THREADS = 1
 | L2 norm of 500x600 matrix (float64), (1000 loops)                           | 0.06301813390018651   |
 | Sort of 500x600 matrix (float64)                                            | 0.009630701900277927  |
 
-##### Standard D (single-thread)
+### Standard D (single-thread)
 
 | Description                                                                           | Time (sec.) |
 | ------------------------------------------------------------------------------------- | ----------- |
@@ -128,7 +128,7 @@ Set environment variables.
 | Matrix product of two [500x600] and [600x500] slices (double)                    | 0.00591477  |
 | Sort of [500x600] slice (double)                                                 | 0.011357    |
 
-##### NumPy (MKL) (multi-thread)
+### NumPy (MKL) (multi-thread)
 
 **Bash**:
 
@@ -153,13 +153,13 @@ export OMP_NUM_THREADS = 4
 | L2 norm of 500x600 matrix (float64), (1000 loops)                           | 0.023907507749936486  |
 | Sort of 500x600 matrix (float64)                                            | 0.010326230399914493  |
 
-##### Standard D (multi-thread)
+### Standard D (multi-thread)
 
 Not implemented for benchmarks.
 
 See how to use [multi-threading](https://tour.dlang.org/tour/en/multithreading/synchronization-sharing) in D.
 
-##### Mir D (multi-thread)
+### Mir D (multi-thread)
 
 Set environment variables: 
     
