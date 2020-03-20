@@ -7,7 +7,7 @@ Each benchmark was run 20 times with 0 sec. timeout, the timings were then colle
 
 ### Versions
 
-* D v2.090.1, mir-algorithm 3.7.19, mir-random 2.2.11, mir-blas 1.1.10
+* D compiler LDC 1.19.0, mir-algorithm 3.7.19, mir-random 2.2.11, mir-blas 1.1.10
 * (Anaconda) Python 3.7.6, NumPy 1.18.1 (MKL)
 
 ### Hardware
@@ -27,7 +27,9 @@ dub run --compiler=ldc2 --build=release --force
 python3 other_benchmarks/basic_ops_bench.py
 ```
 
-### Benchmarks (single-thread)
+### Cumulative Table Benchmarks (single-thread)
+
+#### General Purpose
 
 | Description                                                                 | NumPy (MKL) (sec.)       | Standard D (sec.)                               | Mir D (sec.)            |
 | --------------------------------------------------------------------------- | ------------------------ | ----------------------------------------------- | ----------------------- |
@@ -37,10 +39,11 @@ python3 other_benchmarks/basic_ops_bench.py
 | L2 norm of 500x600 matrix (float64), (1000 loops)                           | 0.06301813390018651      | 0.117289 (x1.9)                                 | **0.0390259** (x1/1.6)  |
 | Matrix product of 500x600 and 600x500 matrices (float64)                    | **0.005560713250088156** | 0.157694 (x28) [*](#unoptimized-matrix-product) | 0.00591477 (x1.1)       |
 | Sort of 500x600 matrix (float64)                                            | **0.009630701900277927** | 0.0110437 (x1.2)                                | 0.011357 (x1.2)         |
-| Neural network training data preprocessing (??? MB)                         |                          |                                                 |                         |
-| Neural network training data preprocessing (??? MB)                         |
 
-### Benchmarks (multi-thread)
+
+### Cumulative Table Benchmarks (multi-thread)
+
+#### General Purpose
 
 | Description                                                                 | NumPy (MKL) (sec.)        | Mir D (sec.)            |
 | --------------------------------------------------------------------------- | ------------------------- | ----------------------- |
@@ -51,7 +54,15 @@ python3 other_benchmarks/basic_ops_bench.py
 | Matrix product of 500x600 and 600x500 matrices (float64)                    | **0.0018566828504845035** | 0.00206505 (x1.1)       |
 | Sort of 500x600 matrix (float64)                                            | **0.010326230399914493**  | 0.0112988 (x1.1)        |
 
-### NumPy (MKL) (single-thread)
+
+#### Domain Specific
+
+| Description                                         | Python + NumPy (sec.) | Standard D + Mir (sec.) |
+| --------------------------------------------------- | --------------------- | ----------------------- |
+| Neural network training data preprocessing (1.5 MB) | 0.15562605835148133   | **0.0460182** (x1/3.4)  |
+| Neural network training data preprocessing (16 MB)  | 1.8649751371500316    | **0.454537** (x1/4.1)   |
+
+#### NumPy (MKL) (single-thread)
 
 In order to limit the number of threads, set the environment variable prior to running the benchmarks.
 For example, anaconda NumPy uses **intel-mkl**, therefore the number of threads is controlled with `MKL_NUM_THREADS` variable.
@@ -107,7 +118,7 @@ export OMP_NUM_THREADS = 1
 | L2 norm of 500x600 matrix (float64), (1000 loops)                           | 0.06301813390018651   |
 | Sort of 500x600 matrix (float64)                                            | 0.009630701900277927  |
 
-### Standard D (single-thread)
+#### Standard D (single-thread)
 
 | Description                                                                           | Time (sec.) |
 | ------------------------------------------------------------------------------------- | ----------- |
@@ -120,7 +131,7 @@ export OMP_NUM_THREADS = 1
 | L2 norm of [500x600] struct matrix (double), (1000 loops)                             | 0.117289    |
 | Sort of [500x600] struct matrix (double)                                              | 0.0110437   |
 
-### Mir D (single-thread)
+#### Mir D (single-thread)
 
 Set environment variables.
 
@@ -139,7 +150,7 @@ Set environment variables.
 | Matrix product of two [500x600] and [600x500] slices (double), (OpenBLAS)        | 0.00591477  |
 | Sort of [500x600] slice (double)                                                 | 0.011357    |
 
-### NumPy (MKL) (multi-thread)
+#### NumPy (MKL) (multi-thread)
 
 **Bash**:
 
@@ -164,13 +175,13 @@ export OMP_NUM_THREADS = 4
 | L2 norm of 500x600 matrix (float64), (1000 loops)                           | 0.023907507749936486  |
 | Sort of 500x600 matrix (float64)                                            | 0.010326230399914493  |
 
-### Standard D (multi-thread)
+#### Standard D (multi-thread)
 
 Not implemented for benchmarks.
 
 See how to use [multi-threading](https://tour.dlang.org/tour/en/multithreading/synchronization-sharing) in D.
 
-### Mir D (multi-thread)
+#### Mir D (multi-thread)
 
 Set environment variables:
 
@@ -188,7 +199,7 @@ Set environment variables:
 | Matrix product of two [500x600] and [600x500] slices (double) (OpenBLAS)         | 0.00206505  |
 | Sort of [500x600] slice (double)                                                 | 0.0112988   |
 
-##### Unoptimized Matrix Product
+#### Unoptimized Matrix Product
 
 Standard D library does not have a function for matrix product therefore we are using plain loop implementation.
 Although looped function is pretty fast with small to medium sized matrices, it becomes prohibitively slow with bigger matrices (efficient matrix multiplication is a field on its own).
@@ -206,5 +217,5 @@ Unoptimized `matrixDotProduct` function timings:
 | 2 x [2000 x 2000] |       44.59 |
 | 2 x [2100 x 2100] |       55.13 |
 
-##### Neural Network Data Preprocessing
+#### Neural Network Data Preprocessing
 

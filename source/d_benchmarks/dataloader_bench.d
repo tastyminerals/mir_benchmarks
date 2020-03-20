@@ -27,8 +27,9 @@ import mir.ndslice;
 import std.typecons : Tuple, tuple;
 import std.stdio;
 
+const string trainFile = "train.tsv";
 enum Delim = '\t';
-enum Hyperparams
+enum Config
 {
     batchSize = 32,
     seqlen = 25,
@@ -110,10 +111,8 @@ void initializeDataloader()
     import std.string;
     import std.conv : to;
 
-    string fileName = "test.tsv";
-
     // generate vocab
-    auto file0 = File(fileName, "r");
+    auto file0 = File(trainFile, "r");
     int[string] vocab;
     int idx = 1;
     string[8] lineForVocab;
@@ -128,7 +127,7 @@ void initializeDataloader()
     }
 
     // read the dataset tsv file, again (we follow Python implementation and repeat some tasks).
-    auto file1 = File(fileName, "r");
+    auto file1 = File(trainFile, "r");
     Data data;
     string[8] lineArr;
     string token;
@@ -152,7 +151,7 @@ void initializeDataloader()
         data.targets ~= label;
     }
 
-    auto dataset = Dataset(Hyperparams.batchSize, Hyperparams.seqlen, Hyperparams.inputSize, data);
+    auto dataset = Dataset(Config.batchSize, Config.seqlen, Config.inputSize, data);
     auto miniBatch = dataset.next_batch;
 
 }
