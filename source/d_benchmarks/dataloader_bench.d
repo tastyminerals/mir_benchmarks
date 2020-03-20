@@ -25,6 +25,7 @@ REQUIREMENTS: Dataloader needs a dataset file generated from real documents in t
 
 import mir.ndslice;
 import std.typecons : Tuple, tuple;
+import std.stdio;
 
 enum Delim = '\t';
 enum Hyperparams
@@ -45,7 +46,6 @@ struct Data
 }
 
 alias DoubleTensor = Slice!(double*, 3LU, cast(mir_slice_kind) 0);
-alias DoubleBatchTensor = Slice!(double*, 3LU, cast(mir_slice_kind) 2);
 
 struct Dataset
 {
@@ -68,33 +68,36 @@ struct Dataset
 
         int err;
         // convert collected arrays into sliceable tensors
-        const int batchNum = cast(int)(
+        const ulong batchNum = cast(ulong)(
                 (data.tokenIdx.length / (cast(float) batchSize * seqLength)).ceil - 1.0);
         assert(batchNum > 0);
 
-        const int iterSize = cast(int)(data.tokenIdx.length / cast(float) batchSize).floor;
-        const int maxSliceable = batchSize * iterSize;
+        const ulong iterSize = data.tokenIdx.length / batchSize;
 
-        this.tokenTensor = data.tokenIdx[0 .. maxSliceable].sliced(batchSize,
+        const ulong maxSizeTokens = batchSize * iterSize;
+        const ulong maxSize = batchSize * iterSize * 2;
+        this.tokenTensor = data.tokenIdx[0 .. maxSizeTokens].sliced(batchSize,
                 iterSize, 1).transposed(1, 0, 2);
 
-        this.posFeatsTensor = data.positionalFeatures[0 .. maxSliceable].sliced(batchSize,
+        this.posFeatsTensor = data.positionalFeatures[0 .. maxSize].sliced(batchSize,
                 iterSize, 2).transposed(1, 0, 2);
 
-        this.addedFeatsTensor = data.addedFeatures[0 .. maxSliceable].sliced(batchSize,
+        this.addedFeatsTensor = data.addedFeatures[0 .. maxSize].sliced(batchSize,
                 iterSize, 2).transposed(1, 0, 2);
 
-        this.targetsTensor = data.targets[0 .. maxSliceable].sliced(batchSize,
+        this.targetsTensor = data.targets[0 .. maxSize].sliced(batchSize,
                 iterSize, 2).transposed(1, 0, 2);
 
     }
 
-    Tuple!(DoubleTensor, string, DoubleTensor, string, DoubleTensor, string, DoubleTensor, string) next_batch()
+    Tuple!(DoubleTensor, DoubleTensor, DoubleTensor, DoubleTensor) next_batch()
     {
-        auto miniBatch = tuple(this.tokenTensor[this.start .. this.end], "tokensBatch",
-                this.posFeatsTensor[this.start .. this.end], "posFeatsBatch",
-                this.addedFeatsTensor[this.start .. this.end], "addedFeatsBatch",
-                this.targetsTensor[this.start .. this.end], "targetsBatch");
+        // for some reason named arguments do not work with mir Slices (bug?)
+        auto miniBatch = tuple!("tokensBatch", "posFeatsBatch", "addedFeatsBatch", "targetsBatch")(
+                this.tokenTensor[this.start .. this.end],
+                this.posFeatsTensor[this.start .. this.end],
+                this.addedFeatsTensor[this.start .. this.end],
+                this.targetsTensor[this.start .. this.end]);
         this.start += this.seqLength;
         this.end += this.seqLength;
         return miniBatch;
@@ -102,17 +105,8 @@ struct Dataset
 
 }
 
-/*
-`Tuple!(Slice!(double*, 3LU, cast(mir_slice_kind)0), string, Slice!(double*, 3LU, cast(mir_slice_kind)0),
- string, Slice!(double*, 3LU, cast(mir_slice_kind)0), string, Slice!(double*, 3LU, cast(mir_slice_kind)0), string)` to
-
- `Tuple!(Slice!(double*, 3LU, cast(mir_slice_kind)0), Slice!(double*, 3LU, cast(mir_slice_kind)0),
- Slice!(double*, 3LU, cast(mir_slice_kind)0), Slice!(double*, 3LU, cast(mir_slice_kind)0))`
-*/
-
-void runDataloaderBenchmark(int nruns)
+void initializeDataloader()
 {
-    import std.stdio;
     import std.string;
     import std.conv : to;
 
@@ -154,9 +148,44 @@ void runDataloaderBenchmark(int nruns)
         data.positionalFeatures ~= [left, top];
         data.addedFeatures ~= [isUpper, repeated];
         data.targets ~= label;
-
     }
 
+    auto dataset = Dataset(32, 25, 100, data);
+    auto miniBatch = dataset.next_batch;
+
+}
+
+void runDataloaderBenchmark(int nruns)
+{
+    pragma(inline, false);
+
+    import std.format;
+
+    import std.datetime.stopwatch : AutoStart, StopWatch;
+    import std.math : pow;
+    import std.algorithm : sum;
+
+    writeln("---[Dataloader]---");
+
+    auto sw = StopWatch(AutoStart.no);
+    long[][string] timings;
+    foreach (i; 0 .. nruns)
+    {
+        sw.reset;
+        sw.start;
+        initializeDataloader;
+        sw.stop;
+        timings["dataloader"] ~= sw.peek.total!"nsecs";
+    }
+
+    import mir.series; // for sorted output
+
+    foreach (pair; timings.series)
+    {
+        // convert nsec. to sec. and compute the average
+        const double secs = pair.value.sum * 10.0.pow(-9) / pair.value.length;
+        writeln(format("| %s | %s |", pair.key, secs));
+    }
 }
 
 unittest

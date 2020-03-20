@@ -331,7 +331,7 @@ void runStandardBenchmarks(int nruns)
     foreach (pair; timings.series)
     {
         // convert nsec. to sec. and compute the average
-        const double secs = pair.value.map!(a => a / pow(1000.0, 3)).sum / pair.value.length;
+        const double secs = pair.value.sum * 10.0.pow(-9) / pair.value.length;
         writeln(format("| %s | %s |", pair.key, secs));
     }
 }
