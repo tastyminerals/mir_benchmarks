@@ -47,7 +47,7 @@ alias SliceMatrixArr = Slice!(double*, 2)[];
         // NOTE: No vectorized fused-multiply-add instructions
         // for direct call s[i] for now.
         // Will be fixed in the next mir-algorithm version.
-        // accu += s0[i] * s1[i]; 
+        // accu += s0[i] * s1[i];
     }
     return accu;
 }
