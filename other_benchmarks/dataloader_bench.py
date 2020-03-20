@@ -197,7 +197,7 @@ if __name__ == "__main__":
     timings = []
     for _ in range(20):
         start = timer()
-        dataset = Dataset("train.tsv")
+        dataset = Dataset("test.tsv")
         dataset.load_input_data()
         batch = dataset.next_batch()
         end = timer()

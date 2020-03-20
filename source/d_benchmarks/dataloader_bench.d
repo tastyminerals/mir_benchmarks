@@ -1,7 +1,7 @@
 module dataloader_bench;
 
 /++
-A naive reimplementation of NNER dataloader.py in D for comparison and benchmarking against Numpy version.
+A naive reimplementation of NNER dataloader.py in D for comparison and benchmarking against NumPy version.
 
 MOTIVATION: Some time ago for NER task we implemented BiLSTM + CRF binary token (word) classifier in Tensorflow.
 In order to train it, we created a Dataloader class that was used to preprocess and feed the training data.
@@ -14,7 +14,7 @@ For example:
     for step in range(data.num_batches):
         words, pos_feats, added_feats, targets = data.next_batch()
 
-Where "words" is a 3D tensor of [batch_size x sequence_length x embedding_dim], e.g. [32 x 25 x 100].
+Where "words" is a 3D tensor of [batch_size x sequence_length x embedding_dim], e.g. [32 x 25 x 1].
 "pos_feats" and "added_feats" are another 3D tensors of shape [batch_size x sequence_length x features], e.g. [32 x 25 x 2].
 Finally, "targets" is a 3D tensor of shape [batch_size x sequence_length x target_bin_value], e.g. [32 x 25 x 2].
 

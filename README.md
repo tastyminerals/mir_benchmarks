@@ -55,7 +55,7 @@ python3 other_benchmarks/basic_ops_bench.py
 | Sort of 500x600 matrix (float64)                                            | **0.010326230399914493**  | 0.0112988 (x1.1)        |
 
 
-#### Domain Specific
+#### [Domain Specific](#neural-network-data-preprocessing)
 
 | Description                                         | Python + NumPy (sec.) | Standard D + Mir (sec.) |
 | --------------------------------------------------- | --------------------- | ----------------------- |
@@ -219,3 +219,29 @@ Unoptimized `matrixDotProduct` function timings:
 
 #### Neural Network Data Preprocessing
 
+General purpose function benchmarks are great but they tell us little about language efficiency in real world tasks.
+Therefore, we implemented a small neural network data preprocessing benchmark.
+
+For this benchmark we used actual code used thousands of times for preprocessing training data for offline BiLSTM model training.
+The BiLSTM model is a word classifier, trained to do named entity recognition for just one specific class.
+In order to train the model, we need to read our training data, preprocess and convert it into multidimensional tensors.
+The multidimensional tensors represent input data and should be sliceable into shapes [batch_size x seq_length x feature_dim], e.g. [32 x 25 x 4].
+
+Our original implementation was written in Python and NumPy for converting to tensors and slicing.
+The D version follows the same pattern and uses Mir numeric library for representing multidimensional arrays and slicing.
+
+Two test datasets (1.5 MB and 16 MB) used in benchmarks contain private information and can not be provided.
+However, the original data looks like the following example table below.
+
+| document_id | masked_token | original_token | feature1 | feature2 | feature3 | feature4 | target_label |
+| ----------- | ------------ | -------------- | -------- | -------- | -------- | -------- | ------------ |
+| 2314        | ich          | Ich            | 231.23   | 20.10    | 1        | 1        | 0            |
+| 2314        | bin          | bin            | 235.1    | 20.10    | 0        | 0        | 0            |
+| 2314        | kartoffel    | Kartoffel      | 240.5    | 20.10    | 1        | 0        | 0            |
+| 2314        | <dig>        | 2              | 244.2    | 20.10    | 0        | 0        | 0            |
+| 2314        | <prep>       | und            | 250      | 20.10    | 0        | 0        | 0            |
+| 2314        | <dig>        | 3              | 255      | 20.10    | 0        | 0        | 0            |
+| 2314        | <punct>      | !              | 240.5    | 20.10    | 0        | 0        | 0            |
+| 2314        | münchen      | München        | 340.32   | 130.23   | 1        | 0        | 1            |
+| 2314        | <func>       | ist            | 355.21   | 130.23   | 0        | 1        | 0            |
+| 2314        | grün         | grün           | 364.78   | 130.23   | 0        | 0        | 0            |
