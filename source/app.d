@@ -31,6 +31,7 @@ void main(string[] args)
     default:
         runStandardBenchmarks(nruns);
         runMirBenchmarks(nruns);
+        runDataloaderBenchmark(nruns);
         break;
     }
 

@@ -15,27 +15,16 @@ class Dataset:
     It preprocesses textual input into numpy arrays ready for iteration
     and further feeding into the neural network using predefined batch size
     and sequence length.
-
-    Create vocab and ivocab maps from the training file (train.tsv).
-    The training file must have the following format:
-    each word and its corresponding features take exactly one line.
-    The number of feature columns can vary (but must be > 3) as long as
-    the expected columns remain in place. The expected (fixed) columns are:
-
-        | doc_id | token | orig_token | ... | target |
     """
 
     def __init__(self, file_path):
         self.fpath = file_path
         self.vocab = None
-        self.ivocab = None
-        self.vocab_size = None
         self.data = []  # a list of extracted tokens, features and targets
         self.inputs = []  # ndarrays preprocessed for batch iteration
         self.batch_size = 32
         self.seq_length = 25
         self.input_size = 100
-        self.vocab_fpath = None
         self.nposfeats = 2
         self.naddfeats = 2
         self.onehot_arity = 2
@@ -57,15 +46,8 @@ class Dataset:
             *sorted(counter.items(), key=lambda x: x[1], reverse=True)
         )
         self.vocab = dict(zip(sorted_tokens, range(0, len(sorted_tokens))))
-        self.ivocab = dict(zip(range(0, len(sorted_tokens)), sorted_tokens))
-        self.vocab_size = len(self.vocab)
 
     def _read_input_data(self):
-        def load_pickle_embeddings_as_dict(fname):
-            with open(fname, "rb") as _in:
-                embeddings = pickle.load(_in)
-            return embeddings
-
         def _is_oov(token):
             if self.vocab.get(token) is None:
                 return True
@@ -194,7 +176,6 @@ class Dataset:
         self.start = 0
         self.end = self.seq_length
 
-    # @batch_debugger
     def next_batch(self):
         tokens = self.inputs["tokens"]
         pos_feats = self.inputs["pos_feats"]
@@ -216,7 +197,7 @@ if __name__ == "__main__":
     timings = []
     for _ in range(20):
         start = timer()
-        dataset = Dataset("test.tsv",)
+        dataset = Dataset("test.tsv")
         dataset.load_input_data()
         batch = dataset.next_batch()
         end = timer()

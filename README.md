@@ -1,5 +1,19 @@
-# D Benchmarks against NumPy
+# Benchmarks against NumPy for Multidimensional D Arrays
+Here is a series of various D benchmarks timed against popular NumPy functions.
+
+We test standard D functions as well as Mir numerical library across different tasks such as multiplication, dot product, sorting and one general neural network data preprocessing task.
+
 Each benchmark was run 20 times with 0 sec. timeout, the timings were then collected and averaged.
+
+### Versions
+
+* D v2.090.1, mir-algorithm 3.7.19, mir-random 2.2.11, mir-blas 1.1.10
+* (Anaconda) Python 3.7.6, NumPy 1.18.1 (MKL)
+
+### Hardware
+
+ * CPU: Quad Core Intel Core i7-7700HQ (-MT MCP-) speed/min/max: 919/800/3800 MHz Kernel: 5.5.7-1-MANJARO x86_64
+ * Mem: 2814.2/48147.6 MiB (5.8%) Storage: 489.05 GiB (6.6% used) Procs: 271 Shell: fish 3.1.0
 
 ### Compile and Run
 
@@ -10,13 +24,8 @@ dub run --compiler=ldc2 --build=release --force
 
 - NumPy
 ```
-python3 other_benchmarks/basic_ops_bench.py 
+python3 other_benchmarks/basic_ops_bench.py
 ```
-
-### Hardware
-
- * CPU: Quad Core Intel Core i7-7700HQ (-MT MCP-) speed/min/max: 919/800/3800 MHz Kernel: 5.5.7-1-MANJARO x86_64 Up: 4h 36m 
- * Mem: 2814.2/48147.6 MiB (5.8%) Storage: 489.05 GiB (6.6% used) Procs: 271 Shell: fish 3.1.0 inxi: 3.0.37 
 
 ### Benchmarks (single-thread)
 
@@ -28,6 +37,8 @@ python3 other_benchmarks/basic_ops_bench.py
 | L2 norm of 500x600 matrix (float64), (1000 loops)                           | 0.06301813390018651      | 0.117289 (x1.9)                                 | **0.0390259** (x1/1.6)  |
 | Matrix product of 500x600 and 600x500 matrices (float64)                    | **0.005560713250088156** | 0.157694 (x28) [*](#unoptimized-matrix-product) | 0.00591477 (x1.1)       |
 | Sort of 500x600 matrix (float64)                                            | **0.009630701900277927** | 0.0110437 (x1.2)                                | 0.011357 (x1.2)         |
+| Neural network training data preprocessing (??? MB)                         |                          |                                                 |                         |
+| Neural network training data preprocessing (??? MB)                         |
 
 ### Benchmarks (multi-thread)
 
@@ -43,14 +54,14 @@ python3 other_benchmarks/basic_ops_bench.py
 ### NumPy (MKL) (single-thread)
 
 In order to limit the number of threads, set the environment variable prior to running the benchmarks.
-For example, anaconda NumPy uses **intel-mkl**, therefore the number of threads is controlled with `MKL_NUM_THREADS` variable. 
+For example, anaconda NumPy uses **intel-mkl**, therefore the number of threads is controlled with `MKL_NUM_THREADS` variable.
 
 Check which backend is used:
 
 ```
-In [1]: import numpy as np                                                       
+In [1]: import numpy as np
 
-In [2]: np.show_config()                                                         
+In [2]: np.show_config()
 blas_mkl_info:
     libraries = ['mkl_rt', 'pthread']
     library_dirs = ['/home/pavel/miniconda3/envs/torch/lib']
@@ -112,7 +123,7 @@ export OMP_NUM_THREADS = 1
 ### Mir D (single-thread)
 
 Set environment variables.
-    
+
 **Bash**: `export OPENBLAS_NUM_THREADS=1`
 
 **Fish**:  `set -x OPENBLAS_NUM_THREADS 1`
@@ -125,7 +136,7 @@ Set environment variables.
 | Element-wise multiplication of two [100x100] slices (double), (1000 loops)       | 0.00301221  |
 | Element-wise sum of two [100x100] slices (int), (1000 loops)                     | 0.00133979  |
 | L2 norm of [500x600] slice (double), (1000 loops)                                | 0.0390259   |
-| Matrix product of two [500x600] and [600x500] slices (double), (OpenBLAS)                   | 0.00591477  |
+| Matrix product of two [500x600] and [600x500] slices (double), (OpenBLAS)        | 0.00591477  |
 | Sort of [500x600] slice (double)                                                 | 0.011357    |
 
 ### NumPy (MKL) (multi-thread)
@@ -161,8 +172,8 @@ See how to use [multi-threading](https://tour.dlang.org/tour/en/multithreading/s
 
 ### Mir D (multi-thread)
 
-Set environment variables: 
-    
+Set environment variables:
+
     * Bash `export OPENBLAS_NUM_THREADS=4`
     * Fish `set -x OPENBLAS_NUM_THREADS 4`
 
@@ -178,6 +189,7 @@ Set environment variables:
 | Sort of [500x600] slice (double)                                                 | 0.0112988   |
 
 ##### Unoptimized Matrix Product
+
 Standard D library does not have a function for matrix product therefore we are using plain loop implementation.
 Although looped function is pretty fast with small to medium sized matrices, it becomes prohibitively slow with bigger matrices (efficient matrix multiplication is a field on its own).
 NumPy uses heavily optimized BLAS [general matrix multiplication `gemm`](https://software.intel.com/en-us/mkl-developer-reference-fortran-gemm) routine.
@@ -193,3 +205,6 @@ Unoptimized `matrixDotProduct` function timings:
 | 2 x [1500 x 1500] |        9.28 |
 | 2 x [2000 x 2000] |       44.59 |
 | 2 x [2100 x 2100] |       55.13 |
+
+##### Neural Network Data Preprocessing
+

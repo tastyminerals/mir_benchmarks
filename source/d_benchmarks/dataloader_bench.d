@@ -66,8 +66,8 @@ struct Dataset
         this.end = seqLength;
         this.seqLength = seqLength;
 
-        int err;
         // convert collected arrays into sliceable tensors
+        int err;
         const ulong batchNum = cast(ulong)(
                 (data.tokenIdx.length / (cast(float) batchSize * seqLength)).ceil - 1.0);
         assert(batchNum > 0);
@@ -111,10 +111,11 @@ void initializeDataloader()
     import std.conv : to;
 
     string fileName = "test.tsv";
+
     // generate vocab
     auto file0 = File(fileName, "r");
     int[string] vocab;
-    int idx = 0;
+    int idx = 1;
     string[8] lineForVocab;
     foreach (line; file0.byLineCopy)
     {
@@ -144,13 +145,14 @@ void initializeDataloader()
         repeated = to!double(lineArr[6]);
         label = lineArr[7] == "0" ? [1.0, 0] : [0, 1.0];
 
-        data.tokenIdx ~= vocab[token];
+        auto exists = (token in vocab);
+        data.tokenIdx ~= exists ? vocab[token] : 0;
         data.positionalFeatures ~= [left, top];
         data.addedFeatures ~= [isUpper, repeated];
         data.targets ~= label;
     }
 
-    auto dataset = Dataset(32, 25, 100, data);
+    auto dataset = Dataset(Hyperparams.batchSize, Hyperparams.seqlen, Hyperparams.inputSize, data);
     auto miniBatch = dataset.next_batch;
 
 }
