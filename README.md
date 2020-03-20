@@ -228,7 +228,7 @@ In order to train the model, we need to read our training data, preprocess and c
 The multidimensional tensors represent input data and should be sliceable into shapes [batch_size x seq_length x feature_dim], e.g. [32 x 25 x 4].
 
 Our original implementation was written in Python and NumPy for converting to tensors and slicing.
-The D version follows the same pattern and uses Mir numeric library for representing multidimensional arrays and slicing.
+The D version follows the same pattern and uses Mir numeric library for representing multidimensional arrays and do the slicing.
 
 Two test datasets (1.5 MB and 16 MB) used in benchmarks contain private information and can not be provided.
 However, the original data looks like the following example table below.
@@ -238,10 +238,10 @@ However, the original data looks like the following example table below.
 | 2314        | ich          | Ich            | 231.23   | 20.10    | 1        | 1        | 0            |
 | 2314        | bin          | bin            | 235.1    | 20.10    | 0        | 0        | 0            |
 | 2314        | kartoffel    | Kartoffel      | 240.5    | 20.10    | 1        | 0        | 0            |
-| 2314        | <dig>        | 2              | 244.2    | 20.10    | 0        | 0        | 0            |
-| 2314        | <prep>       | und            | 250      | 20.10    | 0        | 0        | 0            |
-| 2314        | <dig>        | 3              | 255      | 20.10    | 0        | 0        | 0            |
-| 2314        | <punct>      | !              | 240.5    | 20.10    | 0        | 0        | 0            |
+| 2314        | \<dig>       | 2              | 244.2    | 20.10    | 0        | 0        | 0            |
+| 2314        | \<prep>      | und            | 250      | 20.10    | 0        | 0        | 0            |
+| 2314        | \<dig>       | 3              | 255      | 20.10    | 0        | 0        | 0            |
+| 2314        | \<punct>     | !              | 240.5    | 20.10    | 0        | 0        | 0            |
 | 2314        | münchen      | München        | 340.32   | 130.23   | 1        | 0        | 1            |
-| 2314        | <func>       | ist            | 355.21   | 130.23   | 0        | 1        | 0            |
+| 2314        | \<func>      | ist            | 355.21   | 130.23   | 0        | 1        | 0            |
 | 2314        | grün         | grün           | 364.78   | 130.23   | 0        | 0        | 0            |
