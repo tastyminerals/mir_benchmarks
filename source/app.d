@@ -1,5 +1,6 @@
 import mir_ops_bench;
 import standard_ops_bench;
+import dataloader_bench;
 import std.getopt;
 
 void main(string[] args)
@@ -8,7 +9,8 @@ void main(string[] args)
     string benchmarksId;
 
     auto opts = getopt(args, "n|nruns", "number of runs, the time will be averaged (default 20)", &nruns, "b|bench",
-            "benchmark name to run [standard, mir], runs all if not set", &benchmarksId);
+            "benchmark name to run [standard, mir, dataloader], runs all if not set",
+            &benchmarksId);
     if (opts.helpWanted)
     {
         defaultGetoptPrinter(msg, opts.options);
@@ -22,6 +24,9 @@ void main(string[] args)
         break;
     case "mir":
         runMirBenchmarks(nruns);
+        break;
+    case "dataloader":
+        runDataloaderBenchmark(nruns);
         break;
     default:
         runStandardBenchmarks(nruns);
