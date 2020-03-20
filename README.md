@@ -1,7 +1,7 @@
 # Benchmarks against NumPy for Multidimensional D Arrays
 Here is a series of various D benchmarks timed against popular NumPy functions.
 
-We test standard D functions as well as Mir numerical library across different tasks such as multiplication, dot product, sorting and one general neural network data preprocessing task.
+We test standard D functions as well as Mir numerical library across different tasks such as multiplication, dot product, sorting and one general [neural network data preprocessing task](#neural-network-data-preprocessing).
 
 Each benchmark was run 20 times with 0 sec. timeout, the timings were then collected and averaged.
 
