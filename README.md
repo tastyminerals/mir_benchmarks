@@ -239,7 +239,7 @@ However, the original data looks like the following example table below.
 | 2314        | bin          | bin            | 235.1    | 20.10    | 0        | 0        | 0            |
 | 2314        | kartoffel    | Kartoffel      | 240.5    | 20.10    | 1        | 0        | 0            |
 | 2314        | \<dig>       | 2              | 244.2    | 20.10    | 0        | 0        | 0            |
-| 2314        | \<prep>      | und            | 250      | 20.10    | 0        | 0        | 0            |
+| 2314        | \<prep>      | für            | 250      | 20.10    | 0        | 0        | 0            |
 | 2314        | \<dig>       | 3              | 255      | 20.10    | 0        | 0        | 0            |
 | 2314        | \<punct>     | !              | 240.5    | 20.10    | 0        | 0        | 0            |
 | 2314        | münchen      | München        | 340.32   | 130.23   | 1        | 0        | 1            |
