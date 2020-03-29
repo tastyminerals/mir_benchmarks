@@ -16,7 +16,7 @@ float_arrayB = rand(rows * cols)
 small_int_matrixA = rand(1:10, reduceRows, reduceCols)
 small_int_matrixB = rand(1:10, reduceRows, reduceCols)
 float_matrixA = rand(rows, cols)
-float_matrixC = rand(rows, cols)
+float_matrixC = rand(cols, rows)
 small_float_matrixA = rand(reduceRows, reduceCols)
 small_float_matrixB = rand(reduceRows, reduceCols)
 
