@@ -5,12 +5,8 @@ from time import perf_counter as timer
 import numpy as np
 
 
-def allocation_and_functions():
-    pass
-
-
 def functions(nruns=1):
-    rows, cols = 2000, 2400
+    rows, cols = 500, 600
     reduceRows, reduceCols = rows / 5, cols / 6
 
     small_int_matrixA = np.random.randint(1, 10, [int(reduceRows), int(reduceCols)])
@@ -82,7 +78,6 @@ def functions(nruns=1):
 
 
 def benchmark():
-    # TODO allocation_and_functions()
     results = functions(args.nruns)
     for name, runs in results.items():
         print("| {} | {} |".format(name, sum(runs) / len(runs)))

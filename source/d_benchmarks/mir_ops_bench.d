@@ -60,9 +60,9 @@ alias SliceMatrixArr = Slice!(double*, 2)[];
     // has more robust but slower algorithm
 
     // NOTE: .field returns a common D array
-    // to workaround the same vectorisation bug as for loopedScalarProduct
+    // to workaround the same vectorization bug as for loopedScalarProduct
     // Note: ^^ 2 is faster then .pow(2)
-    // Note: e * e is better for optimiser then ^^ 2
+    // Note: e * e is better for optimizer then ^^ 2
     foreach (e; m.field)
         accu += e * e;
     return accu.sqrt;
