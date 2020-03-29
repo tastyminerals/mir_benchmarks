@@ -45,14 +45,15 @@ python3 other_benchmarks/basic_ops_bench.py
 
 #### General Purpose
 
-| Description                                                                 | NumPy (MKL) (sec.)        | Mir D (sec.)            |
-| --------------------------------------------------------------------------- | ------------------------- | ----------------------- |
-| Dot (scalar) product of two 300000 arrays (float64), (1000 loops)           | 0.03528142820068751       | **0.0309097** (x1/1.1)  |
-| Element-wise sum of two 100x100 matrices (int), (1000 loops)                | 0.0037877704002312385     | **0.0015176** (x1/2.5)  |
-| Element-wise multiplication of two 100x100 matrices (float64), (1000 loops) | 0.004193491550176986      | **0.00293436** (x1/1.4) |
-| L2 norm of 500x600 matrix (float64), (1000 loops)                           | **0.023907507749936486**  | 0.0398216 (x1.7)        |
-| Matrix product of 500x600 and 600x500 matrices (float64)                    | **0.0018566828504845035** | 0.00206505 (x1.1)       |
-| Sort of 500x600 matrix (float64)                                            | **0.010326230399914493**  | 0.0112988 (x1.1)        |
+| Description                                                                 | NumPy (MKL) (sec.)        | Mir D (sec.)            | Julia (sec)           |
+| --------------------------------------------------------------------------- | ------------------------- | ----------------------- | --------------------- |
+| Dot (scalar) product of two 300000 arrays (float64), (1000 loops)           | 0.03528142820068751       | 0.0309097 (x1/1.1)      | **0.027905** (x1/1.3) |
+| Element-wise sum of two 100x100 matrices (int), (1000 loops)                | 0.0037877704002312385     | **0.0015176** (x1/2.5)  | 0.0061 (x1.6)         |
+| Element-wise multiplication of two 100x100 matrices (float64), (1000 loops) | 0.004193491550176986      | **0.00293436** (x1/1.4) | 0.032161 (x7.7)       |
+| L2 norm of 500x600 matrix (float64), (1000 loops)                           | **0.023907507749936486**  | 0.0398216 (x1.7)        | 0.096 (x4)            |
+| Matrix product of 500x600 and 600x500 matrices (float64)                    | **0.0018566828504845035** | 0.00206505 (x1.1)       | 0.01988 (x10.7)       |
+| Sort of 500x600 matrix (float64)                                            | **0.010326230399914493**  | 0.0112988 (x1.1)        | 0.0161 (x1.6)         |
+
 
 
 #### [Domain Specific](#neural-network-data-preprocessing)
@@ -150,6 +151,13 @@ Set environment variables.
 | Matrix product of two [500x600] and [600x500] slices (double), (OpenBLAS)        | 0.00591477  |
 | Sort of [500x600] slice (double)                                                 | 0.011357    |
 
+#### Julia (single-thread)
+
+Set environment variables.
+
+**Bash**: `export JULIA_NUM_THREADS=1`
+**Fish**: `set -x JULIA_NUM_THREADS 1`
+
 #### NumPy (MKL) (multi-thread)
 
 **Bash**:
@@ -198,6 +206,22 @@ Set environment variables:
 | L2 norm of [500x600] slice (double), (1000 loops)                                | 0.0398216   |
 | Matrix product of two [500x600] and [600x500] slices (double) (OpenBLAS)         | 0.00206505  |
 | Sort of [500x600] slice (double)                                                 | 0.0112988   |
+
+#### Julia (multi-thread)
+
+Set environment variables:
+
+    * Bash `export JULIA_NUM_THREADS=4`
+    * Fish `set -x JULIA_NUM_THREADS 4`
+
+| Description                                                                 | Time (sec.) |
+| --------------------------------------------------------------------------- | ----------- |
+| Element-wise sum of two 100x100 matrices (int), (1000 loops)                | 0.0061      |
+| Element-wise multiplication of two 100x100 matrices (float64), (1000 loops) | 0.032161    |
+| Dot (scalar) product of two 300000 arrays (float64), (1000 loops)           | 0.027905    |
+| Matrix product of 500x600 and 600x500 matrices (float64)                    | 0.01988     |
+| L2 norm of 500x600 matrix (float64), (1000 loops)                           | 0.096       |
+| Sort of 500x600 matrix (float64)                                            | 0.0161      |
 
 #### Unoptimized Matrix Product
 

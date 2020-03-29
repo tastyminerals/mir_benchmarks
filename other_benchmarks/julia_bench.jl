@@ -3,22 +3,20 @@ using Random
 using LinearAlgebra
 
 
-nruns = 20
-
 BenchmarkTools.DEFAULT_PARAMETERS.evals = 20
 
 # define arrays and matrices
-rows, cols = 500, 600
-reduceRows, reduceCols = Int(rows / 5), Int(cols / 6)
+const rows, cols = 500, 600
+const reduceRows, reduceCols = Int(rows / 5), Int(cols / 6)
 
-float_arrayA = rand(rows * cols)
-float_arrayB = rand(rows * cols)
-small_int_matrixA = rand(1:10, reduceRows, reduceCols)
-small_int_matrixB = rand(1:10, reduceRows, reduceCols)
-float_matrixA = rand(rows, cols)
-float_matrixC = rand(cols, rows)
-small_float_matrixA = rand(reduceRows, reduceCols)
-small_float_matrixB = rand(reduceRows, reduceCols)
+const float_arrayA = rand(rows * cols)
+const float_arrayB = rand(rows * cols)
+const small_int_matrixA = rand(1:10, reduceRows, reduceCols)
+const small_int_matrixB = rand(1:10, reduceRows, reduceCols)
+const float_matrixA = rand(rows, cols)
+const float_matrixC = rand(cols, rows)
+const small_float_matrixA = rand(reduceRows, reduceCols)
+const small_float_matrixB = rand(reduceRows, reduceCols)
 
 test1_name = "Element-wise sum of two $(reduceRows)x$(reduceCols) matrices (int), (1000 loops)"
 function test1()
@@ -30,7 +28,7 @@ end
 test2_name = "Element-wise multiplication of two $(reduceRows)x$(reduceCols) matrices (float64), (1000 loops)"
 function test2()
     for _ in 1:1000
-        _ = small_float_matrixA * small_float_matrixB
+        _ = small_float_matrixA .* small_float_matrixB
     end
 end
 
