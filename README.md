@@ -143,8 +143,7 @@ export OMP_NUM_THREADS = 1
 Set environment variables.
 
 **Bash**: `export OPENBLAS_NUM_THREADS=1`
-
-**Fish**:  `set -x OPENBLAS_NUM_THREADS 1`
+**Fish**: `set -x OPENBLAS_NUM_THREADS 1`
 
 | Description                                                                      | Time (sec.) |
 | -------------------------------------------------------------------------------- | ----------- |
@@ -186,14 +185,14 @@ export OMP_NUM_THREADS = 4
 
 Not implemented for benchmarks.
 
-See how to use [multi-threading](https://tour.dlang.org/tour/en/multithreading/synchronization-sharing) in D.
+See how to use [multi-threading](https://tour.dlang.org/tour/en/multithreading/synchronization-sharing) in standard D.
 
 #### Mir D (multi-thread)
 
-Set environment variables:
+Set environment variables.
 
-    * Bash `export OPENBLAS_NUM_THREADS=4`
-    * Fish `set -x OPENBLAS_NUM_THREADS 4`
+**Bash**: `export OPENBLAS_NUM_THREADS=4`
+**Fish**: `set -x OPENBLAS_NUM_THREADS 4`
 
 | Description                                                                      | Time (sec.) |
 | -------------------------------------------------------------------------------- | ----------- |
@@ -210,10 +209,10 @@ Set environment variables:
 
 Julia by default uses single thread according to the docs but `htop` was reporting all cores busy.
 
-Set environment variables:
+Set environment variables.
 
-    * Bash `export JULIA_NUM_THREADS=4`
-    * Fish `set -x JULIA_NUM_THREADS 4`
+**Bash**: `export JULIA_NUM_THREADS=4`
+**Fish**: `set -x JULIA_NUM_THREADS 4`
 
 Test it with `julia -e "println(Threads.nthreads())`.
 | Description                                                                 | Time (sec.) |
