@@ -1,23 +1,13 @@
 Element-wise sum of two 100x100 matrices (int), (1000 loops)
-  6.068 ms (2000 allocations: 76.37 MiB)
-  0.0061 sec.
-
+  6.298 ms (2000 allocations: 76.37 MiB)
 Element-wise multiplication of two 100x100 matrices (float64), (1000 loops)
-  32.161 ms (2000 allocations: 76.37 MiB)
-  0.032161 sec.
-
+  6.170 ms (2000 allocations: 76.37 MiB)
 Dot (scalar) product of two 300000 arrays (float64), (1000 loops)
-  27.905 ms (1000 allocations: 15.63 KiB)
-  0.027905
-
+  29.993 ms (0 allocations: 0 bytes)
 Matrix product of 500x600 and 600x500 matrices (float64)
-  1.988 ms (2 allocations: 1.91 MiB)
-  0.01988
-
+  1.986 ms (2 allocations: 1.91 MiB)
 L2 norm of 500x600 matrix (float64), (1000 loops)
-  96.034 ms (1000 allocations: 15.63 KiB)
-  0.096
-
+  97.891 ms (0 allocations: 0 bytes)
 Sort of 500x600 matrix (float64)
-  16.059 ms (18 allocations: 4.58 MiB)
-  0.0161
+  16.032 ms (17 allocations: 4.58 MiB)
+
