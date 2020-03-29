@@ -3,6 +3,7 @@
 Here is a series of various D and Julia benchmarks timed against popular NumPy functions.
 
 We test standard D functions as well as Mir numerical library across different tasks such as multiplication, dot product, sorting and one general [neural network data preprocessing task](#neural-network-data-preprocessing).
+
 Added Julia benchmarks out of curiosity.
 
 Each benchmark was run 20 times with 0 sec. timeout, the timings were then collected and averaged (NumPy, D).
@@ -10,9 +11,9 @@ Julia code was benchmarked with `@btime` macro from `BenchmarkTools` package.
 
 ## Versions
 
-* D compiler LDC 1.19.0, mir-algorithm 3.7.19, mir-random 2.2.11, mir-blas 1.1.10, (OpenBLAS)
+* D compiler LDC 1.19.0, mir-algorithm 3.7.19, mir-random 2.2.11, mir-blas 1.1.10 (OpenBLAS)
 * (Anaconda) Python 3.7.6, NumPy 1.18.1 (MKL)
-* Julia 1.4.0, (OpenBLAS)
+* Julia 1.4.0 (OpenBLAS)
 
 ## Hardware
 
@@ -40,34 +41,34 @@ python3 other_benchmarks/basic_ops_bench.py
 
 #### General Purpose (single-thread)
 
-| Description                                                                 | NumPy (MKL) (sec.)       | Standard D (sec.)                                 | Mir D (sec.)            |
-| --------------------------------------------------------------------------- | ------------------------ | ------------------------------------------------- | ----------------------- |
-| Dot (scalar) product of two 300000 arrays (float64), (1000 loops)           | 0.10080685440025264      | 0.170738 (x1.7)                                   | **0.0892025** (x1/1.1)  |
-| Element-wise sum of two 100x100 matrices (int), (1000 loops)                | 0.0038669097997626523    | 0.00368572 (x1/1.1)                               | **0.00133979** (x1/2.9) |
-| Element-wise multiplication of two 100x100 matrices (float64), (1000 loops) | 0.004186091849987861     | 0.037623 (x9)                                     | **0.00301221** (x1/1.4) |
-| L2 norm of 500x600 matrix (float64), (1000 loops)                           | 0.06301813390018651      | 0.117289 (x1.9)                                   | **0.0390259** (x1/1.6)  |
-| Matrix product of 500x600 and 600x500 matrices (float64)                    | **0.005560713250088156** | 0.157694 (x28) [*](#not-optimized-matrix-product) | 0.00591477 (x1.1)       |
-| Sort of 500x600 matrix (float64)                                            | **0.009630701900277927** | 0.0110437 (x1.2)                                  | 0.011357 (x1.2)         |
+| Description                                                                 | NumPy (MKL) (sec.) | Standard D (sec.)                                | Mir D (sec.)         |
+| --------------------------------------------------------------------------- | ------------------ | ------------------------------------------------ | -------------------- |
+| Dot (scalar) product of two 300000 arrays (float64), (1000 loops)           | 0.10081            | 0.17074 (x1.7)                                   | **0.0892** (x1/1.1)  |
+| Element-wise sum of two 100x100 matrices (int), (1000 loops)                | 0.00387            | 0.00369 (x1/1.1)                                 | **0.00134** (x1/2.9) |
+| Element-wise multiplication of two 100x100 matrices (float64), (1000 loops) | 0.00419            | 0.03762 (x9)                                     | **0.00301** (x1/1.4) |
+| L2 norm of 500x600 matrix (float64), (1000 loops)                           | 0.06302            | 0.11729 (x1.9)                                   | **0.03903** (x1/1.6) |
+| Matrix product of 500x600 and 600x500 matrices (float64)                    | **0.00556**        | 0.15769 (x28) [*](#not-optimized-matrix-product) | 0.00592 (x1.1)       |
+| Sort of 500x600 matrix (float64)                                            | **0.00963**        | 0.01104 (x1.2)                                   | 0.01136 (x1.2)       |
 
 ### Cumulative Table Benchmarks (multi-thread)
 
 #### General Purpose (multi-thread)
 
-| Description                                                                 | NumPy (MKL) (sec.)        | Mir D (sec.)            | Julia (sec.)      |
-| --------------------------------------------------------------------------- | ------------------------- | ----------------------- | ----------------- |
-| Dot (scalar) product of two 300000 arrays (float64), (1000 loops)           | 0.03528142820068751       | 0.0309097 (x1/1.1)      | **0.03** (x1/1.1) |
-| Element-wise sum of two 100x100 matrices (int), (1000 loops)                | 0.0037877704002312385     | **0.0015176** (x1/2.5)  | 0.0063 (x1.6)     |
-| Element-wise multiplication of two 100x100 matrices (float64), (1000 loops) | 0.004193491550176986      | **0.00293436** (x1/1.4) | 0.00617 (x1.5)    |
-| L2 norm of 500x600 matrix (float64), (1000 loops)                           | **0.023907507749936486**  | 0.0398216 (x1.7)        | 0.097 (x4.1)      |
-| Matrix product of 500x600 and 600x500 matrices (float64)                    | **0.0018566828504845035** | 0.00206505 (x1.1)       | 0.01988 (x10.7)   |
-| Sort of 500x600 matrix (float64)                                            | **0.010326230399914493**  | 0.0112988 (x1.1)        | 0.0161 (x1.6)     |
+| Description                                                                 | NumPy (MKL) (sec.) | Mir D (sec.)         | Julia (sec.)      |
+| --------------------------------------------------------------------------- | ------------------ | -------------------- | ----------------- |
+| Dot (scalar) product of two 300000 arrays (float64), (1000 loops)           | 0.03528            | 0.03091 (x1/1.1)     | **0.03** (x1/1.1) |
+| Element-wise sum of two 100x100 matrices (int), (1000 loops)                | 0.00379            | **0.00152** (x1/2.5) | 0.0063 (x1.6)     |
+| Element-wise multiplication of two 100x100 matrices (float64), (1000 loops) | 0.00419            | **0.00293** (x1/1.4) | 0.00617 (x1.5)    |
+| L2 norm of 500x600 matrix (float64), (1000 loops)                           | **0.02391**        | 0.03982 (x1.7)       | 0.097 (x4.1)      |
+| Matrix product of 500x600 and 600x500 matrices (float64)                    | **0.00186**        | 0.00207 (x1.1)       | 0.01988 (x10.7)   |
+| Sort of 500x600 matrix (float64)                                            | **0.01033**        | 0.0113 (x1.1)        | 0.0161 (x1.6)     |
 
 #### [Domain Specific](#neural-network-data-preprocessing)
 
 | Description                                         | Python + NumPy (sec.) | Standard D + Mir (sec.) |
 | --------------------------------------------------- | --------------------- | ----------------------- |
-| Neural network training data preprocessing (1.5 MB) | 0.15562605835148133   | **0.0460182** (x1/3.4)  |
-| Neural network training data preprocessing (16 MB)  | 1.8649751371500316    | **0.454537** (x1/4.1)   |
+| Neural network training data preprocessing (1.5 MB) | 0.15563               | **0.04602** (x1/3.4)    |
+| Neural network training data preprocessing (16 MB)  | 1.86498               | **0.45454** (x1/4.1)    |
 
 #### NumPy (MKL) (single-thread)
 
