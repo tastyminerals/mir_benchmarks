@@ -41,27 +41,27 @@ python3 other_benchmarks/basic_ops_bench.py
 
 #### General Purpose (single-thread)
 
-| Description                                                                 | NumPy (MKL) (sec.) | Standard D (sec.)                                | Mir D (sec.)         |
-| --------------------------------------------------------------------------- | ------------------ | ------------------------------------------------ | -------------------- |
-| Dot (scalar) product of two 300000 arrays (float64), (1000 loops)           | 0.10081            | 0.17074 (x1.7)                                   | **0.0892** (x1/1.1)  |
-| Element-wise sum of two 100x100 matrices (int), (1000 loops)                | 0.00387            | 0.00369 (x1/1.1)                                 | **0.00134** (x1/2.9) |
-| Element-wise multiplication of two 100x100 matrices (float64), (1000 loops) | 0.00419            | 0.03762 (x9)                                     | **0.00301** (x1/1.4) |
-| L2 norm of 500x600 matrix (float64), (1000 loops)                           | 0.06302            | 0.11729 (x1.9)                                   | **0.03903** (x1/1.6) |
-| Matrix product of 500x600 and 600x500 matrices (float64)                    | **0.00556**        | 0.15769 (x28) [*](#not-optimized-matrix-product) | 0.00592 (x1.1)       |
-| Sort of 500x600 matrix (float64)                                            | **0.00963**        | 0.01104 (x1.2)                                   | 0.01136 (x1.2)       |
+| Description                                                                 | NumPy (sec.) | Standard D (sec.)                                | Mir D (sec.)         |
+| --------------------------------------------------------------------------- | ------------ | ------------------------------------------------ | -------------------- |
+| Dot (scalar) product of two 300000 arrays (float64), (1000 loops)           | 0.10081      | 0.17074 (x1.7)                                   | **0.0892** (x1/1.1)  |
+| Element-wise sum of two 100x100 matrices (int), (1000 loops)                | 0.00387      | 0.00369 (x1/1.1)                                 | **0.00134** (x1/2.9) |
+| Element-wise multiplication of two 100x100 matrices (float64), (1000 loops) | 0.00419      | 0.03762 (x9)                                     | **0.00301** (x1/1.4) |
+| L2 norm of 500x600 matrix (float64), (1000 loops)                           | 0.06302      | 0.11729 (x1.9)                                   | **0.03903** (x1/1.6) |
+| Matrix product of 500x600 and 600x500 matrices (float64)                    | **0.00556**  | 0.15769 (x28) [*](#not-optimized-matrix-product) | 0.00592 (x1.1)       |
+| Sort of 500x600 matrix (float64)                                            | **0.00963**  | 0.01104 (x1.2)                                   | 0.01136 (x1.2)       |
 
 ### Cumulative Table Benchmarks (multi-thread)
 
 #### General Purpose (multi-thread)
 
-| Description                                                                 | NumPy (MKL) (sec.) | Mir D (sec.)         | Julia (sec.)      |
-| --------------------------------------------------------------------------- | ------------------ | -------------------- | ----------------- |
-| Dot (scalar) product of two 300000 arrays (float64), (1000 loops)           | 0.03528            | 0.03091 (x1/1.1)     | **0.03** (x1/1.1) |
-| Element-wise sum of two 100x100 matrices (int), (1000 loops)                | 0.00379            | **0.00152** (x1/2.5) | 0.0063 (x1.6)     |
-| Element-wise multiplication of two 100x100 matrices (float64), (1000 loops) | 0.00419            | **0.00293** (x1/1.4) | 0.00617 (x1.5)    |
-| L2 norm of 500x600 matrix (float64), (1000 loops)                           | **0.02391**        | 0.03982 (x1.7)       | 0.097 (x4.1)      |
-| Matrix product of 500x600 and 600x500 matrices (float64)                    | **0.00186**        | 0.00207 (x1.1)       | 0.01988 (x10.7)   |
-| Sort of 500x600 matrix (float64)                                            | **0.01033**        | 0.0113 (x1.1)        | 0.0161 (x1.6)     |
+| Description                                                                 | NumPy (sec.) | Mir D (sec.)         | Julia (sec.)      |
+| --------------------------------------------------------------------------- | ------------ | -------------------- | ----------------- |
+| Dot (scalar) product of two 300000 arrays (float64), (1000 loops)           | 0.03528      | 0.03091 (x1/1.1)     | **0.03** (x1/1.1) |
+| Element-wise sum of two 100x100 matrices (int), (1000 loops)                | 0.00379      | **0.00152** (x1/2.5) | 0.0063 (x1.6)     |
+| Element-wise multiplication of two 100x100 matrices (float64), (1000 loops) | 0.00419      | **0.00293** (x1/1.4) | 0.00617 (x1.5)    |
+| L2 norm of 500x600 matrix (float64), (1000 loops)                           | **0.02391**  | 0.03982 (x1.7)       | 0.097 (x4.1)      |
+| Matrix product of 500x600 and 600x500 matrices (float64)                    | **0.00186**  | 0.00207 (x1.1)       | 0.01988 (x10.7)   |
+| Sort of 500x600 matrix (float64)                                            | **0.01033**  | 0.0113 (x1.1)        | 0.0161 (x1.6)     |
 
 #### [Domain Specific](#neural-network-data-preprocessing)
 
@@ -70,7 +70,7 @@ python3 other_benchmarks/basic_ops_bench.py
 | Neural network training data preprocessing (1.5 MB) | 0.15563               | **0.04602** (x1/3.4)    |
 | Neural network training data preprocessing (16 MB)  | 1.86498               | **0.45454** (x1/4.1)    |
 
-#### NumPy (MKL) (single-thread)
+#### NumPy (single-thread)
 
 In order to limit the number of threads, set the environment variable prior to running the benchmarks.
 For example, anaconda NumPy uses **intel-mkl**, therefore the number of threads is controlled with `MKL_NUM_THREADS` variable.
@@ -157,7 +157,7 @@ Set environment variables.
 | Matrix product of two [500x600] and [600x500] slices (double), (OpenBLAS)        | 0.00591477  |
 | Sort of [500x600] slice (double)                                                 | 0.011357    |
 
-#### NumPy (MKL) (multi-thread)
+#### NumPy (multi-thread)
 
 **Bash**:
 
