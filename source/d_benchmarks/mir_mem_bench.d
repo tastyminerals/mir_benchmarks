@@ -1,4 +1,4 @@
-module standard_mem_bench;
+module mir_mem_bench;
 
 /*
 Memory allocation benchmarks for standard D:
@@ -11,30 +11,23 @@ Memory allocation benchmarks for standard D:
 
 import core.memory : GC;
 import mir.math.common : fastmath;
-import std.algorithm : each, fill, joiner, map, sort, sum, SwapStrategy;
-import std.array;
-import std.format;
-import std.stdio;
-import std.random : randomShuffle, uniform, unpredictableSeed, Xorshift;
-import std.range : chunks, generate, iota, take, zip;
-import std.math : pow, sqrt;
+import mir.math.sum;
+import mir.ndslice;
+import mir.random.algorithm : randomSlice;
+import mir.random.variable : uniformVar;
+import std.array : join;
 import std.datetime.stopwatch : AutoStart, StopWatch;
+import std.format;
+import std.math : pow, sqrt;
+import std.random : randomShuffle, uniform, unpredictableSeed, Xorshift;
+import std.stdio;
 
-static T[] getRandomArray(T)(in int elems)
-{
-    Xorshift rnd;
-    rnd.seed(unpredictableSeed);
-    return generate(() => uniform(0, 1.0, rnd)).take(elems).array;
-}
+alias SliceArr = Slice!(double*)[];
 
 long[][string] functions(in int nruns)
 {
     auto sw = StopWatch(AutoStart.no);
     const size = 30_000_000;
-
-    Xorshift rnd;
-    rnd.seed(unpredictableSeed);
-    auto lazyArr = generate(() => uniform(0, 1.0, rnd)).take(size);
 
     long[][string] funcs;
     string name0 = format("Allocation, writing and deallocation of a [%s] array ", size);
@@ -45,11 +38,11 @@ long[][string] functions(in int nruns)
         for (int j; j < 5; ++j)
         {
             // allocate
-            double[] arr = lazyArr.array;
+            auto arr = uniformVar!double(0, 1.0).randomSlice(size);
             // write
             arr[j] = 100.0;
             // destroy
-            arr = null;
+            destroy(arr);
             GC.collect;
         }
         sw.stop;
@@ -65,44 +58,44 @@ long[][string] functions(in int nruns)
         foreach (mod; mods)
         {
             // allocate
-            double[] arr = getRandomArray!double(size / mod);
+            auto arr = uniformVar!double(0, 1.0).randomSlice(size);
             // write
             arr[mod] = 100.0;
             // destroy
-            arr = null;
+            destroy(arr);
             GC.collect;
         }
         sw.stop;
         funcs[name1] ~= sw.peek.total!"nsecs";
     }
 
-    const int size1 = size / 100_000;
-    const size2 = iota(1, size1 + 1).sum;
+    const int size1 = size / 10_000;
+    const size2 = iota([size1 + 1], 1).sum;
     string name2 = format("Slicing [%s] array into another array (%s loops)", size1, size1);
-    double[size1] arr = getRandomArray!double(size1);
+    auto arr = uniformVar!double(0, 1.0).randomSlice(size1);
     for (int i; i < nruns; ++i)
     {
         sw.reset;
         sw.start;
-        double[] a;
-        a.reserve(size2);
+        SliceArr a;
         for (int j; j < size1; ++j)
         {
             a ~= arr[j .. $];
         }
+        a.join;
         sw.stop;
         funcs[name2] ~= sw.peek.total!"nsecs";
-        a = null;
+        destroy(a);
         GC.collect;
     }
 
     return funcs;
 }
 
-void runStandardMemoryBenchmarks(int nruns)
+void runMirMemoryBenchmarks(int nruns)
 {
     pragma(inline, false);
-    writeln("---[Standard Memory D]---");
+    writeln("---[Mir Memory D]---");
     auto timings = functions(nruns);
     import mir.series; // for sorted output
     foreach (pair; timings.series)

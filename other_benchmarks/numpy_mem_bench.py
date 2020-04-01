@@ -19,12 +19,13 @@ env variables to control NumPy threads:
     export VECLIB_MAXIMUM_THREADS = 1
     export OMP_NUM_THREADS = 1
 """
+
 import argparse
+import gc
 from collections import defaultdict as dd
 from time import perf_counter as timer
 
 import numpy as np
-import gc
 
 
 def functions(nruns):
@@ -57,21 +58,19 @@ def functions(nruns):
         end = timer()
         funcs[name1].append(end - start)
 
-    size1 = size // 1000
-    name2 = "Reallocation of one [{}] array into two arrays".format(size1)
+    size1 = size // 10_000
+    name2 = "Slicing [{}] array into another array ({} loops)".format(size1, size1)
     float_arrayA = np.random.rand(size1)
     for _ in range(nruns):
         start = timer()
-        a = np.empty(size1, dtype=np.float64)
-        b = []
+        a = []
         for i in np.arange(size1):
-            a[i] = float_arrayA[i]
-            b.append(float_arrayA[i:-1])
+            a.append(float_arrayA[i:-1])
 
-        b = np.concatenate(np.array(b))
+        a = np.concatenate(np.array(a))
         end = timer()
         funcs[name2].append(end - start)
-        del a, b
+        del a
         gc.collect()
 
     return funcs

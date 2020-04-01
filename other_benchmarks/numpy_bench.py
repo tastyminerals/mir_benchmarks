@@ -1,3 +1,25 @@
+"""
+NumPy docs:
+
+The NumPy linear algebra functions rely on BLAS and LAPACK to provide efficient low level
+implementations of standard linear algebra algorithms.
+Those libraries may be provided by NumPy itself using C versions of a subset of their
+reference implementations but, when possible, highly optimized libraries that take advantage
+of specialized processor functionality are preferred. Examples of such libraries are
+OpenBLAS, MKL (TM), and ATLAS.
+Because those libraries are multithreaded and processor dependent, environmental variables
+and external packages such as threadpoolctl may be needed to control the number of threads
+or specify the processor architecture.
+
+env variables to control NumPy threads:
+
+    export OPENBLAS_NUM_THREADS = 1
+    export MKL_NUM_THREADS = 1
+    export NUMEXPR_NUM_THREADS = 1
+    export VECLIB_MAXIMUM_THREADS = 1
+    export OMP_NUM_THREADS = 1
+"""
+
 import argparse
 from collections import defaultdict as dd
 from time import perf_counter as timer

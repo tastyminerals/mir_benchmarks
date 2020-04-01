@@ -1,7 +1,8 @@
-import mir_ops_bench;
-import standard_ops_bench;
 import dataloader_bench;
+import mir_mem_bench;
+import mir_ops_bench;
 import standard_mem_bench;
+import standard_ops_bench;
 import std.getopt;
 
 void main(string[] args)
@@ -25,7 +26,8 @@ void main(string[] args)
         runStandardMemoryBenchmarks(nruns);
         break;
     case "mir":
-        runMirBenchmarks(nruns);
+        // runMirBenchmarks(nruns);
+        runMirMemoryBenchmarks(nruns);
         break;
     case "dataloader":
         runDataloaderBenchmark(nruns);
