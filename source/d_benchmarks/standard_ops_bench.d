@@ -22,7 +22,7 @@ import std.algorithm : each, fill, joiner, map, sort, sum, SwapStrategy;
 import std.array : array;
 import std.datetime.stopwatch : AutoStart, StopWatch;
 import std.format : format;
-import std.math : pow, sqrt;
+import std.math : approxEqual, pow, sqrt;
 import std.numeric : dotProduct;
 import std.random : randomShuffle, uniform, unpredictableSeed, Xorshift;
 import std.range : chunks, generate, take, zip;
@@ -335,27 +335,40 @@ void runStandardBenchmarks(int nruns)
 
 unittest
 {
-    int[][] arr1 = [[1, 2, 3], [4, 5, 6]];
-    int[][] arr2 = [[1, 1, 1], [2, 2, 2]];
-    int[][] res0 = [[2, 3, 4], [6, 7, 8]];
-    assert(elementWiseOP(OPS.sum, arr1, arr2) == res0);
+    auto m = Matrix!int(2, 3);
+    int[][] res0 = [[0, 0, 0], [0, 0, 0]];
+    assert(m.to2D == res0);
 
-    auto ma = Matrix!int(2, 3, [2, 1, 1, 2, 2, 0]);
-    auto mb = Matrix!int(2, 3, [-1, 0, 1, 0, 0, -1]);
-    int[][] res1 = [[1, 1, 2], [2, 2, -1]];
-    assert(matrixElementWiseOp!int(OPS.sum, ma, mb).to2D == res1);
+    m = Matrix!int(2, 3, [1, 0, 5, 2, 1, -3]);
+    assert(m[1, 2] == -3);
 
-    auto mc = Matrix!double(2, 3, [-2, 0, 1, 0, 0, -3]);
-    auto md = Matrix!double(3, 2, [-1, 0, 2, 0, 0, -1]);
-    auto initM = Matrix!double(2, 2);
-    auto res2 = Matrix!double(2, 2, [2, -1, 0, 3]);
-    assert(matrixDotProduct!double(mc, md, initM).data == res2.data);
+    auto arr = getRandomAArray!double(1.0, 2, 3);
+    assert(arr.length == 2);
+    assert(arr[1].length == 3);
 
-    import std.math : approxEqual;
+    auto arr2 = getRandomArray!int(10, 10);
+    assert(arr2.length == 10);
 
-    auto me = Matrix!double(2, 3, [-1.5, 2.3, 1.1, 0.2, 0.5, -3.7]);
-    double res3 = 4.7676;
-    auto res4 = Matrix!double(2, 3, [-3.7, -1.5, 0.2, 0.5, 1.1, 2.3]);
-    assert(approxEqual(squareL2Norm!double(me), res3));
-    assert(standardSort!double(me).to2D == res4.to2D);
+    int[][] a = [[1, 1, 1], [2, 0, 3]];
+    int[][] b = [[1, 1, 1], [-1, -1, -1]];
+    auto res1 = [[2, 2, 2], [1, -1, 2]];
+    assert(elementWiseOP("+", a, b) == res1);
+
+    auto m1 = Matrix!double(2, 2, [1.0, 1.2, 2.5, 4.1]);
+    auto m2 = Matrix!double(2, 2, [-2.5, 0.5, -3.3, 2.0]);
+    double[] res2 = [-2.5, 0.6, -8.25, 8.2];
+    assert(matrixElementWiseOp("*", m1, m2) == res2);
+
+    auto m3 = Matrix!int(2, 3, [2, 2, 2, 1, 1, 1]);
+    auto m4 = Matrix!int(3, 2, [1, 1, 2, 2, 1, 1]);
+    auto m5 = Matrix!int(2, 2);
+    auto res3 = [8, 8, 4, 4];
+    assert(matrixDotProduct(m3, m4, m5) == res3);
+
+    double res4 = 4.62493;
+    assert(approxEqual(squareL2Norm(m2), res4));
+
+    auto m6 = Matrix!int(2, 5, [2, 3, 0, 1, -5, 2, 4, 7, 0, 1]);
+    assert(columnWiseSort(m6).to2D[1] == [0, 1, 2, 4, 7]);
+
 }
