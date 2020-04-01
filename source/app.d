@@ -22,11 +22,11 @@ void main(string[] args)
     switch (benchmarksId)
     {
     case "standard":
-        // runStandardBenchmarks(nruns);
+        runStandardBenchmarks(nruns);
         runStandardMemoryBenchmarks(nruns);
         break;
     case "mir":
-        // runMirBenchmarks(nruns);
+        runMirBenchmarks(nruns);
         runMirMemoryBenchmarks(nruns);
         break;
     case "dataloader":
@@ -36,6 +36,7 @@ void main(string[] args)
         runStandardBenchmarks(nruns);
         runStandardMemoryBenchmarks(nruns);
         runMirBenchmarks(nruns);
+        runMirMemoryBenchmarks(nruns);
         runDataloaderBenchmark(nruns);
         break;
     }
@@ -44,7 +45,9 @@ void main(string[] args)
 
 static string msg = q"EOD
 Run D benchmarks for standard D and Mir D.
+Options [standard, mir, dataloader].
 
 Usage:
 ./app -n 20 -b standard
+
 EOD";

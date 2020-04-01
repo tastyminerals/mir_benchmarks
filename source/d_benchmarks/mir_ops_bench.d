@@ -23,6 +23,7 @@ import mir.random.algorithm : randomSlice, shuffle;
 import mir.random.variable : uniformVar;
 import std.datetime.stopwatch : StopWatch;
 import std.format : format;
+import std.math : approxEqual;
 import std.stdio;
 
 alias SliceArr = Slice!(double*);
@@ -87,9 +88,7 @@ long[][string] functions(in int nruns = 10)
     auto smallIntMatrixB = uniformVar!int(1, 10).randomSlice(reduceRows, reduceCols);
     auto smallMatrixA = uniformVar!double(0.0, 1.0).randomSlice(reduceRows, reduceCols);
     auto smallMatrixB = uniformVar!double(0.0, 1.0).randomSlice(reduceRows, reduceCols);
-    auto matrixA = uniformVar!double(0.0, 1.0).randomSlice(rows, cols);
     auto matrixB = uniformVar!double(0.0, 1.0).randomSlice(rows, cols);
-    auto matrixC = uniformVar!double(0.0, 1.0).randomSlice(cols, rows);
     auto sliceA = uniformVar!double(0.0, 1.0).randomSlice(rows * cols);
     auto sliceB = uniformVar!double(0.0, 1.0).randomSlice(rows * cols);
 
@@ -250,4 +249,14 @@ void runMirBenchmarks(int nruns)
         const double secs = pair.value.sum * 10.0.pow(-9) / pair.value.length;
         writeln(format("| %s | %s |", pair.key, secs));
     }
+}
+
+unittest
+{
+    auto s0 = [1, 2, 0.5, 2, 4, -1, 3].sliced;
+    auto s1 = [2, 4, 2.5, 0, 3, 1, 5].sliced;
+    assert(scalarProduct(s0, s1) == 37.25);
+    assert(loopedScalarProduct(s0, s1) == 37.25);
+    auto s2 = [2, 3, 1, -2.3, -1, 5].sliced(2, 3);
+    assert(approxEqual(squareL2Norm(s2), 6.72978));
 }

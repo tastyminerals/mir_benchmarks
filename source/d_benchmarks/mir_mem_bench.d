@@ -105,8 +105,3 @@ void runMirMemoryBenchmarks(int nruns)
         writeln(format("| %s | %s |", pair.key, secs));
     }
 }
-
-unittest
-{
-
-}
