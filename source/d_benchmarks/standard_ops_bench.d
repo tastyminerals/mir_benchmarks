@@ -14,9 +14,6 @@ This file contains several benchmarks for multidimensional D arrays:
 There are two multidimensional array representations: array of arrays and a struct using a single array.
 First two benchmarks show how slow array of arrays are in comparison to single array struct.
 The remaining benchmarks use single array struct for multidimensional array representation.
-
-RUN: dub run --compiler=ldc2 --build=release
-TEST: dub run --compiler=ldc2 --build=tests
 */
 
 import core.memory : GC;
@@ -281,9 +278,9 @@ long[][string] functions(in int nruns = 10)
         funcs[name4] ~= sw.peek.total!"nsecs";
     }
 
-    /* 
-        We pick smaller because straight calculation of matrices >5kk elems becomes prohibitevely slow 
-        without using optimization techniques. 
+    /*
+        We pick smaller because straight calculation of matrices >5kk elems becomes prohibitevely slow
+        without using optimization techniques.
     */
     string name5 = format("(Reference only) unoptimized matrix product of two [%sx%s] struct matrices (double)",
             rows, cols);

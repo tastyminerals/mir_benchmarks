@@ -1,6 +1,7 @@
 import mir_ops_bench;
 import standard_ops_bench;
 import dataloader_bench;
+import standard_mem_bench;
 import std.getopt;
 
 void main(string[] args)
@@ -20,7 +21,8 @@ void main(string[] args)
     switch (benchmarksId)
     {
     case "standard":
-        runStandardBenchmarks(nruns);
+        // runStandardBenchmarks(nruns);
+        runStandardMemoryBenchmarks(nruns);
         break;
     case "mir":
         runMirBenchmarks(nruns);
@@ -30,6 +32,7 @@ void main(string[] args)
         break;
     default:
         runStandardBenchmarks(nruns);
+        runStandardMemoryBenchmarks(nruns);
         runMirBenchmarks(nruns);
         runDataloaderBenchmark(nruns);
         break;

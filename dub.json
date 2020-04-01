@@ -13,8 +13,9 @@
 		"mir-random": "~>2.2.11",
 		"mir-blas": "~>1.1.9"
 	},
-    "dflags-ldc": ["-mcpu=native"],
-    "subConfigurations": {"mir-blas": "library", "comment": "Also try MKL like 'mkl-tbb-thread'"},
+	"dflags-ldc": ["-mcpu=native"],
+	"subConfigurations": {"mir-blas": "library", "comment": "Also try MKL like 'mkl-tbb-thread'"},
+	"lflags": ["C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.18362.0\\um\\x64\\BufferOverflowU.lib"],
 	"buildTypes": {
 		"release": {
 			"buildOptions": ["releaseMode", "inline", "optimize"],

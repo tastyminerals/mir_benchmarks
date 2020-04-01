@@ -13,7 +13,7 @@ RUN: dub run --compiler=ldc2 --build=release
 TEST: dub run --compiler=ldc2 --build=tests
 */
 
-import mir.blas : dot, gemm;
+// import mir.blas : dot, gemm;
 import mir.math.common : fastmath, optmath;
 import mir.math.common : pow, sqrt;
 import mir.math.sum;
@@ -178,9 +178,8 @@ long[][string] functions(in int nruns = 10)
     {
         sw.reset;
         sw.start;
-        for (int j; j < 1000; ++j)
-            gsharedRes = dot(sliceA, sliceB);
-        sw.stop;
+        for (int j; j < 1000; ++j) // gsharedRes = dot(sliceA, sliceB);
+            sw.stop;
         measurementsDotBLAS[i] = sw.peek.total!"nsecs";
     }
 
@@ -199,7 +198,7 @@ long[][string] functions(in int nruns = 10)
         // mir-blas can be linked with Intel-MKL (including multithreaded version)
         // please try it instead of OpenBLAS (check its subConfiguration options).
         // Or, at least it compile OpenBLAS with for the native CPU.
-        gemm(1.0, matrixA, matrixC, 0, matrixD);
+        // gemm(1.0, matrixA, matrixC, 0, matrixD);
         sw.stop;
         measurements4[i] = sw.peek.total!"nsecs";
     }
