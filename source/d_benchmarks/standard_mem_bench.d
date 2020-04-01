@@ -56,7 +56,7 @@ long[][string] functions(in int nruns)
         funcs[name0] ~= sw.peek.total!"nsecs";
     }
 
-    string name1 = "Allocation, writing and deallocation of a several arrays ";
+    string name1 = "Allocation, writing and deallocation of a several big arrays of different sizes";
     int[] mods = [10, 3, 5, 60, 1];
     for (int i; i < nruns; ++i)
     {
@@ -76,30 +76,26 @@ long[][string] functions(in int nruns)
         funcs[name1] ~= sw.peek.total!"nsecs";
     }
 
-    const int size1 = size / 60_000;
-    const size2 = iota(1, size1).sum;
-    string name2 = format("Reallocation of one array into three arrays", size1);
-    double[] arr = getRandomArray!double(size);
+    const int size1 = size / 1000;
+    const size2 = iota(1, size1 + 1).sum;
+    string name2 = format("Reallocation of one [%s] array into two arrays", size1);
+    double[size1] arr = getRandomArray!double(size1);
     for (int i; i < nruns; ++i)
     {
-        double[] a;
-        double[] b, c;
-        a.reserve(size1);
-        b.reserve(size2);
-        c.reserve(size2);
         sw.reset;
         sw.start;
-        for (int j; j <= size1; ++j)
+        double[size1] a;
+        double[] b;
+        b.reserve(size2);
+        for (int j; j < size1; ++j)
         {
-            a ~= arr[j];
-            b ~= arr[$ - j .. $];
-            c ~= arr[j .. $];
+            a[j] = arr[j]; // do we need this?
+            b ~= arr[j .. $];
         }
         sw.stop;
         funcs[name2] ~= sw.peek.total!"nsecs";
         a = null;
         b = null;
-        c = null;
         GC.collect;
     }
 

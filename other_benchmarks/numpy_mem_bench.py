@@ -1,3 +1,24 @@
+"""
+NumPy docs:
+
+The NumPy linear algebra functions rely on BLAS and LAPACK to provide efficient low level
+implementations of standard linear algebra algorithms.
+Those libraries may be provided by NumPy itself using C versions of a subset of their
+reference implementations but, when possible, highly optimized libraries that take advantage
+of specialized processor functionality are preferred. Examples of such libraries are
+OpenBLAS, MKL (TM), and ATLAS.
+Because those libraries are multithreaded and processor dependent, environmental variables
+and external packages such as threadpoolctl may be needed to control the number of threads
+or specify the processor architecture.
+
+env variables to control NumPy threads:
+
+    export OPENBLAS_NUM_THREADS = 1
+    export MKL_NUM_THREADS = 1
+    export NUMEXPR_NUM_THREADS = 1
+    export VECLIB_MAXIMUM_THREADS = 1
+    export OMP_NUM_THREADS = 1
+"""
 import argparse
 from collections import defaultdict as dd
 from time import perf_counter as timer
@@ -23,7 +44,7 @@ def functions(nruns):
         end = timer()
         funcs[name0].append(end - start)
 
-    name1 = "Allocation, writing and deallocation of a several arrays "
+    name1 = "Allocation, writing and deallocation of a several big arrays of different sizes"
     mods = [10, 3, 5, 60, 1]
     for _ in range(nruns):
         start = timer()
@@ -36,19 +57,21 @@ def functions(nruns):
         end = timer()
         funcs[name1].append(end - start)
 
-    name2 = "Reallocation of one [{}] array into three arrays".format(size / 60000)
-    float_arrayA = np.random.rand(size)
-    size0 = size / 60000
+    size1 = size // 1000
+    name2 = "Reallocation of one [{}] array into two arrays".format(size1)
+    float_arrayA = np.random.rand(size1)
     for _ in range(nruns):
         start = timer()
-        for i in range(size0):
-            a = float_arrayA[i]
-            b = float_arrayA[i:-1]
-            c = float_arrayA[-i:-1]
+        a = np.empty(size1, dtype=np.float64)
+        b = []
+        for i in np.arange(size1):
+            a[i] = float_arrayA[i]
+            b.append(float_arrayA[i:-1])
 
+        b = np.concatenate(np.array(b))
         end = timer()
         funcs[name2].append(end - start)
-        del a, b, c
+        del a, b
         gc.collect()
 
     return funcs
