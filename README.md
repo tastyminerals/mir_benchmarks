@@ -3,8 +3,9 @@
 Here is a series of various D and Julia benchmarks timed against popular NumPy functions.
 
 We test standard D functions as well as Mir numerical library across different tasks such as multiplication, dot product, sorting and one general [neural network data preprocessing task](#neural-network-data-preprocessing).
+Additionally, we test standard D and Mir memory allocation, reallocation and garbage collection against NumPy.
 
-Added Julia benchmarks out of curiosity.
+*Added Julia benchmarks out of curiosity.
 
 Each benchmark was run 20 times with 0 sec. timeout, the timings were then collected and averaged (NumPy, D).
 Julia code was benchmarked with `@btime` macro from `BenchmarkTools` package.
@@ -49,6 +50,14 @@ python3 other_benchmarks/basic_ops_bench.py
 | L2 norm of 500x600 matrix (float64), (1000 loops)                           | 0.06302      | 0.11729 (x1.9)                                   | **0.03903** (x1/1.6) |
 | Matrix product of 500x600 and 600x500 matrices (float64)                    | **0.00556**  | 0.15769 (x28) [*](#not-optimized-matrix-product) | 0.00592 (x1.1)       |
 | Sort of 500x600 matrix (float64)                                            | **0.00963**  | 0.01104 (x1.2)                                   | 0.01136 (x1.2)       |
+
+### Cumulative Table Memory Benchmarks (single-thread)
+
+| Description                                                                     | Numpy (sec.) | Standard D (sec.) | Mir D (sec.)   |
+| ------------------------------------------------------------------------------- | ------------ | ----------------- | -------------- |
+| Allocation, writing and deallocation of a [30000000] array                      | 0.94646      | 0.96885 (x1)      | 0.92168 (x1)   |
+| Allocation, writing and deallocation of a several big arrays of different sizes | 0.32987      | 0.31707 (x1)      | 0.91351 (x2.8) |
+| Slicing [30000] array into another array (30000 loops)                          | 0.39881      | 0.32689 (x1/1.2)  | 0.39911 (x1)   |
 
 ### Cumulative Table Benchmarks (multi-thread)
 
@@ -224,6 +233,30 @@ Test it with `julia -e "println(Threads.nthreads())`.
 | Matrix product of 500x600 and 600x500 matrices (float64)                    | 0.01988     |
 | L2 norm of 500x600 matrix (float64), (1000 loops)                           | 0.097       |
 | Sort of 500x600 matrix (float64)                                            | 0.0161      |
+
+#### NumPy Memory (single-thread)
+
+| Description                                                                     | Time (sec.)        |
+| ------------------------------------------------------------------------------- | ------------------ |
+| Allocation, writing and deallocation of a [30000000] array                      | 0.9464583551500254 |
+| Allocation, writing and deallocation of a several big arrays of different sizes | 0.3298667574499632 |
+| Slicing [30000] array into another array (30000 loops)                          | 0.3988089733500601 |
+
+#### Standard D Memory (single-thread)
+
+| Description                                                                     | Time (sec.) |
+| ------------------------------------------------------------------------------- | ----------- |
+| Allocation, writing and deallocation of a [30000000] array                      | 0.968854    |
+| Allocation, writing and deallocation of a several big arrays of different sizes | 0.317072    |
+| Slicing [30000] array into another array (30000 loops)                          | 0.326886    |
+
+#### Mir D Memory (single-thread)
+
+| Description                                                                     | Time (sec.) |
+| ------------------------------------------------------------------------------- | ----------- |
+| Allocation, writing and deallocation of a [30000000] array                      | 0.921682    |
+| Allocation, writing and deallocation of a several big arrays of different sizes | 0.913509    |
+| Slicing [30000] array into another array (30000 loops)                          | 0.399107    |
 
 #### Not optimized Matrix Product
 

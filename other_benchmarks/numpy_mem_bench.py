@@ -58,7 +58,7 @@ def functions(nruns):
         end = timer()
         funcs[name1].append(end - start)
 
-    size1 = size // 10_000
+    size1 = size // 1000
     name2 = "Slicing [{}] array into another array ({} loops)".format(size1, size1)
     float_arrayA = np.random.rand(size1)
     for _ in range(nruns):
@@ -96,3 +96,4 @@ if __name__ == "__main__":
     )
     args = prs.parse_args()
     benchmark()
+

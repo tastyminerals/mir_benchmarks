@@ -69,7 +69,7 @@ long[][string] functions(in int nruns)
         funcs[name1] ~= sw.peek.total!"nsecs";
     }
 
-    const int size1 = size / 10_000;
+    const int size1 = size / 1000;
     const size2 = iota([size1 + 1], 1).sum;
     string name2 = format("Slicing [%s] array into another array (%s loops)", size1, size1);
     auto arr = uniformVar!double(0, 1.0).randomSlice(size1);
