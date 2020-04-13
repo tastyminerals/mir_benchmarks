@@ -1,0 +1,36 @@
+name "mir_benchmarks"
+description "misc D benchmarks."
+authors "tasty"
+copyright "Copyright © 2020, tasty"
+license "MIT"
+dependency "mir-algorithm" version="~>3.7.28"
+dependency "mir-random" version="~>2.2.11"
+dependency "mir-blas" version="~>1.1.13"
+
+targetType "executable"
+dflags-ldc "-mcpu=native"
+subConfiguration "mir-blas" "mkl-tbb-thread-dll"
+
+// lflags `C:\Program Files (x86)\Windows Kits\10\Lib\10.0.18362.0\um\x64\BufferOverflowU.lib` platform="windows-x86_64"
+// lflags `C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\lib\x64\libcmt.lib` platform="windows-x86_64"
+// lflags `C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\lib\x64\libvcruntime.lib` platform="windows-x86_64"
+// lflags `C:\Program Files (x86)\Windows Kits\10\Lib\10.0.18362.0\ucrt\x64\libucrt.lib` platform="windows-x86_64"
+
+buildType "release" {
+    buildOptions "releaseMode" "inline" "optimize"
+    dflags "-boundscheck=off"
+}
+
+buildType "debug" {
+    buildOptions "debugMode" "debugInfo" "optimize"
+}
+
+buildType "debug-profile" {
+    buildOptions "debugMode" "debugInfo" "profile"
+}
+
+buildType "tests" {
+    buildOptions "unittests"
+}
+
+

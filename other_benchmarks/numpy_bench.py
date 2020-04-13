@@ -46,7 +46,7 @@ def functions(nruns=1):
     )
     for _ in range(nruns):
         start = timer()
-        for _ in range(1000):
+        for _ in np.arange(1000):
             _ = small_int_matrixA + small_int_matrixB
         end = timer()
         funcs[name].append(end - start)
@@ -56,7 +56,7 @@ def functions(nruns=1):
     )
     for _ in range(nruns):
         start = timer()
-        for _ in range(1000):
+        for _ in np.arange(1000):
             _ = small_float_matrixA * small_float_matrixB
         end = timer()
         funcs[name].append(end - start)
@@ -66,7 +66,7 @@ def functions(nruns=1):
     )
     for _ in range(nruns):
         start = timer()
-        for _ in range(1000):
+        for _ in np.arange(1000):
             _ = float_arrayA @ float_arrayB
         end = timer()
         funcs[name].append(end - start)
@@ -83,7 +83,7 @@ def functions(nruns=1):
     name = "L2 norm of {}x{} matrix (float64), (1000 loops)".format(rows, cols)
     for _ in range(nruns):
         start = timer()
-        for _ in range(1000):
+        for _ in np.arange(1000):
             _ = np.linalg.norm(float_matrixA)
         end = timer()
         funcs[name].append(end - start)

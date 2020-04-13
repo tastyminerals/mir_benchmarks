@@ -1,34 +1,56 @@
 {
-	"name": "app",
+	"name": "mir_benchmarks",
 	"authors": [
 		"tasty"
 	],
 	"description": "misc D benchmarks",
-	"copyright": "Copyright © 2019, tasty",
+	"copyright": "Copyright © 2020, tasty",
 	"license": "MIT",
-
 	"targetType": "executable",
 	"dependencies": {
 		"mir-algorithm": "~>3.7.18",
 		"mir-random": "~>2.2.11",
 		"mir-blas": "~>1.1.9"
 	},
-	"dflags-ldc": ["-mcpu=native"],
-	"subConfigurations": {"mir-blas": "library", "comment": "Also try MKL like 'mkl-tbb-thread'"},
+	"dflags-ldc": [
+		"-mcpu=native"
+	],
+	"lflags": [
+		"C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.18362.0\\um\\x64\\BufferOverflowU.lib"
+	],
+	"subConfigurations": {
+		"mir-blas": "mkl-tbb-thread",
+		"comment": "Also try MKL like 'mkl-tbb-thread', 'mkl-sequential', 'library'"
+	},
 	"buildTypes": {
 		"release": {
-			"buildOptions": ["releaseMode", "inline", "optimize"],
-			"dflags": ["-boundscheck=off"]
+			"buildOptions": [
+				"releaseMode",
+				"inline",
+				"optimize"
+			],
+			"dflags": [
+				"-boundscheck=off"
+			]
 		},
 		"debug": {
-			"buildOptions": ["debugMode", "debugInfo", "optimize"]
+			"buildOptions": [
+				"debugMode",
+				"debugInfo",
+				"optimize"
+			]
 		},
 		"debug-profile": {
-			"buildOptions": ["debugMode", "debugInfo", "profile"]
+			"buildOptions": [
+				"debugMode",
+				"debugInfo",
+				"profile"
+			]
 		},
 		"tests": {
-			"buildOptions": ["unittests"]
+			"buildOptions": [
+				"unittests"
+			]
 		}
-
 	}
 }
